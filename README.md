@@ -66,3 +66,9 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
     * Install pipenv (we will use it for virtual environment): `pip install pipenv`
     * Install Django: `pipenv install django==4.2.3`
     * Create virtual environment: `pipenv shell`
+2. Create Django project
+    * Create Django project: `django-admin startproject settings .`
+    * Create Django app: `python manage.py startapp jeonse`
+    * Add `jeonse` to `INSTALLED_APPS` in `settings.py`
+    * Run server: `python manage.py runserver`
+    * Open browser and go to `http://localhost:8000`: `open http://localhost:8000`
