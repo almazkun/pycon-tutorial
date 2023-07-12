@@ -61,27 +61,28 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
 In this tutorial, we will build a rental listing website using Django, a popular Python web framework. The application will allow users to create and manage rental listings, as well as search for listings based on various criteria.
 ### 2. Prerequisites
 
-* Python 3.8+ ([Python](https://www.python.org/downloads/))
-* Django 4.2+ ([Django](https://pypi.org/project/Django/))
-* Pipenv (or any other virtual environment manager)
-* Shell (Terminal, Command Prompt, etc.)
-* Text Editor ([VS Code](https://code.visualstudio.com/))
+1. Python 3.8+ ([Python](https://www.python.org/downloads/))
+1. Django 4.2+ ([Django](https://pypi.org/project/Django/))
+1. Pipenv ([Pipenv](https://pypi.org/project/pipenv/), or any other virtual environment manager)
+1. Shell (Terminal, Command Prompt, PowerShell, etc.)
+1. Text Editor ([VS Code](https://code.visualstudio.com/) or any other editor of your choice)
 
 ### 3. Setting up the Project
 1. **Install Python 3.8+ and Django 4.2+**
 
-    * Install python: https://www.python.org/downloads/
-    * Make a directory for the project: `mkdir django-jeonse`
-    * Change directory to the project: `cd django-jeonse`
-    * Install pipenv (we will use it for virtual environment): `pip install pipenv`
-    * Install Django: `pipenv install django==4.2.3`
-    * Create virtual environment: `pipenv shell`
+    1. Install python: https://www.python.org/downloads/
+    1. Make a directory for the project: `mkdir django-jeonse`
+    1. Change directory to the project: `cd django-jeonse`
+    1. Install pipenv (we will use it for virtual environment): `pip install pipenv`
+    1. Install Django: `pipenv install django==4.2.3`
+    1. Create virtual environment: `pipenv shell`
+    1. Open this project in VS Code: `code .`
 
 2. **Create Django project**
 
-    * Create Django project: `django-admin startproject settings .`
-    * Create Django app: `python manage.py startapp jeonse`
-    * Add `jeonse` to `INSTALLED_APPS` in `settings.py`:
+    1. Create Django project: `django-admin startproject settings .`
+    1. Create Django app: `python manage.py startapp jeonse`
+    1. Add `jeonse` to `INSTALLED_APPS` in `settings.py`:
         ```python
         # settings.py
 
@@ -95,11 +96,11 @@ In this tutorial, we will build a rental listing website using Django, a popular
             "jeonse"                        # <-- Add this line
         ]
         ```
-    * Run server: `python manage.py runserver`
-    * Open browser and go to `http://localhost:8000`: `open http://localhost:8000`
+    1. Run server: `python manage.py runserver`
+    1. Open browser and go to `http://localhost:8000`: `open http://localhost:8000`
 
 3. **Custom user model**
-    * Open `jeonse/models.py` and add `CustomUser` model:
+    1. Open `jeonse/models.py` and add `CustomUser` model:
         ```python
         from django.contrib.auth.models import AbstractUser
         from django.db import models
@@ -107,12 +108,90 @@ In this tutorial, we will build a rental listing website using Django, a popular
         class CustomUser(AbstractUser):
             pass
         ```
-    * Add `AUTH_USER_MODEL = 'jeonse.CustomUser'` to `settings.py`
+    1. Add `AUTH_USER_MODEL = 'jeonse.CustomUser'` to `settings.py`
         ```python
         # settings.py
 
         AUTH_USER_MODEL = 'jeonse.CustomUser'
         ```
-    * Run makemigrations: `python manage.py makemigrations`
-    * Run migrate: `python manage.py migrate`
-    * Run server: `python manage.py runserver`
+    1. Run makemigrations: `python manage.py makemigrations`
+    1. Run migrate: `python manage.py migrate`
+    1. Run server: `python manage.py runserver`
+
+4. **Create User Signup and Signin Views**
+    1. Install django-allauth: `pipenv install django-allauth==0.54.0`
+    1. Add `allauth` to `INSTALLED_APPS` in `settings.py`:
+        ```python
+        # settings.py
+
+        INSTALLED_APPS = [
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+            "jeonse",
+            "allauth",                          # <-- Add this line
+            "allauth.account",                  # <-- Add this line
+            "allauth.socialaccount",            # <-- Add this line
+        ]
+        ```
+    1. Add `'django.template.context_processors.request'` to `TEMPLATES`
+    1. Add `AUTHENTICATION_BACKENDS` in `settings.py`:
+        ```python
+        # settings.py
+
+        # django-allauth settings
+        # https://django-allauth.readthedocs.io/en/latest/installation.html
+        AUTHENTICATION_BACKENDS = [
+            'django.contrib.auth.backends.ModelBackend',
+            'allauth.account.auth_backends.AuthenticationBackend',
+        ]
+        ```
+    1. Configure Allauth settings in `settings.py`:
+        ```python
+        # settings.py
+
+        # https://django-allauth.readthedocs.io/en/latest/configuration.html
+        ACCOUNT_USERNAME_REQUIRED = False
+        ACCOUNT_AUTHENTICATION_METHOD = "email"
+        ACCOUNT_EMAIL_REQUIRED = True
+        ACCOUNT_UNIQUE_EMAIL = True
+        ACCOUNT_EMAIL_VERIFICATION = "none"
+        ```
+    1. Create `urls.py` in `jeonse` app: `touch jeonse/urls.py`
+    1. Create `account_login`, `account_logout`, `account_signup`, end `reset_password` URLs in `jeonse/urls.py`:
+        ```python
+        # jeonse/urls.py
+
+        from django.urls import path
+        from allauth.account import views as allauth_views
+
+        urlpatterns = [
+            path('accounts/login/', allauth_views.LoginView.as_view(), name='account_login'),
+            path('accounts/logout/', allauth_views.LogoutView.as_view(), name='account_logout'),
+            path('accounts/signup/', allauth_views.SignupView.as_view(), name='account_signup'),
+            path('accounts/password/reset/', allauth_views.PasswordResetView.as_view(), name='account_reset_password'),
+            path('accounts/email/change/', allauth_views.EmailView.as_view(), name='account_email'),
+        ]
+        ```
+    1. Include `jeonse.urls` in `settings/urls.py`:
+        ```python
+        # settings/urls.py
+
+        from django.contrib import admin
+        from django.urls import path, include # <-- Add this line
+
+        urlpatterns = [
+            path('admin/', admin.site.urls),
+            path('', include('jeonse.urls')), # <-- Add this line
+        ]
+        ```
+    1. Run makemigrations: `python manage.py makemigrations`
+    1. Run migrate: `python manage.py migrate`
+    1. Run server: `python manage.py runserver`
+    1. Open browser and go to `http://localhost:8000/accounts/signup/`: `open http://localhost:8000/accounts/signup/`
+    1. Create a new user and login
+    1. Open browser and go to `http://localhost:8000/accounts/logout/`: `open http://localhost:8000/accounts/logout/`
+    1. Logout and login again
