@@ -57,3 +57,12 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
     * Recap of what was covered in the tutorial
     * Encouraging further exploration and enhancements to the application
 
+
+## Tutorial
+1. Install Python 3.8+ and Django 4.2+
+    * Install python: https://www.python.org/downloads/
+    * Make a directory for the project: `mkdir django-jeonse`
+    * Change directory to the project: `cd django-jeonse`
+    * Install pipenv (we will use it for virtual environment): `pip install pipenv`
+    * Install Django: `pipenv install django==4.2.3`
+    * Create virtual environment: `pipenv shell`
