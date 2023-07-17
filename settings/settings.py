@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     "jeonse",
     "allauth",
     "allauth.account",
-    "allauth.socialaccount",
 ]
 
 MIDDLEWARE = [
