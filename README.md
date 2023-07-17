@@ -133,8 +133,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
             "django.contrib.staticfiles",
             "jeonse",
             "allauth",                          # <-- Add this line
-            "allauth.account",                  # <-- Add this line
-            "allauth.socialaccount",            # <-- Add this line
         ]
         ```
     1. Add `'django.template.context_processors.request'` to `TEMPLATES`
@@ -172,10 +170,41 @@ In this tutorial, we will build a rental listing website using Django, a popular
             path('accounts/login/', allauth_views.LoginView.as_view(), name='account_login'),
             path('accounts/logout/', allauth_views.LogoutView.as_view(), name='account_logout'),
             path('accounts/signup/', allauth_views.SignupView.as_view(), name='account_signup'),
-            path('accounts/password/reset/', allauth_views.PasswordResetView.as_view(), name='account_reset_password'),
-            path('accounts/email/change/', allauth_views.EmailView.as_view(), name='account_email'),
         ]
         ```
+    1. Create templated:
+        ```
+        mkdir jeonse/templates
+        mkdir jeonse/templates/account
+        touch jeonse/templates/account/login.html
+        touch jeonse/templates/account/logout.html
+        touch jeonse/templates/account/signup.html
+        ```    
+    1. Modify templates:
+        ```html
+        # jeonse/templates/account/login.html
+        
+        <form method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+        ```
+        ```html
+        # jeonse/templates/account/logout.html
+
+        <form method="POST">{% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+        ```
+        ```html
+        # jeonse/templates/account/signup.html
+
+        <form method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Signup</button>
+        </form>
+        ```
+        
     1. Include `jeonse.urls` in `settings/urls.py`:
         ```python
         # settings/urls.py
