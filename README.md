@@ -30,9 +30,8 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
     * Create Listing Model and Views
     * Configuring URL patterns for different views
 1. User Authentication and Permissions
-    * Implementing user registration and login functionality
-    * Restricting certain views or actions to authenticated users
-    * Implementing authorization and permissions as required
+    * Restricting views and actions to authenticated users
+    * Restricting views and actions to listing owners
 1. Styling with CSS
     * Adding CSS stylesheets to enhance the application's appearance
     * Applying responsive design principles for better user experience
@@ -336,3 +335,69 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
     1. Create a new listing: `open http://localhost:8000/create/`
     1. View the listing: `open http://localhost:8000/1/`
+
+6. **Restricting views and actions to creators**
+    1. Create `mixins.py`:
+        ```bash
+        touch jeonse/mixins.py
+        ```
+    1. Add `CreatorRequiredMixin` to `jeonse/mixins.py`:
+        ```python
+        # jeonse/mixins.py
+
+        from django.contrib.auth.mixins import UserPassesTestMixin
+
+        class UserIsCreatorMixin(UserPassesTestMixin):
+            def test_func(self):
+                return self.request.user == self.get_object().creator
+        ```
+    1. Modify `jeonse/views.py`:
+        ```python
+        # jeonse/views.py
+
+        from django.views.generic import ListView, DetailView, CreateView
+        from django.urls import reverse_lazy
+        from jeonse.forms import ListingForm
+        from jeonse.models import Listing
+        from django.contrib.auth.mixins import LoginRequiredMixin
+        from jeonse.mixins import UserIsCreatorMixin
+
+
+        class ListingListView(LoginRequiredMixin, ListView):
+            model = Listing
+            template_name = "listing_list.html"
+
+            def get_queryset(self):
+                return Listing.objects.filter(creator=self.request.user)
+
+
+        class ListingDetailView(LoginRequiredMixin, UserIsCreatorMixin, DetailView):
+            model = Listing
+            template_name = "listing_detail.html"
+
+
+        class ListingCreateView(LoginRequiredMixin, CreateView):
+            model = Listing
+            form_class = ListingForm
+            template_name = "listing_create.html"
+            success_url = reverse_lazy("listing_list")
+
+            def form_valid(self, form):
+                form.instance.creator = self.request.user
+                return super().form_valid(form)
+        ``` 
+    1. Modify `jeonse/forms.py`:
+        ```python
+        from django import forms
+        from jeonse.models import Listing
+
+        class ListingForm(forms.ModelForm):
+            class Meta:
+                model = Listing
+                fields = "__all__"
+                exclude = ["creator"]  # <-- Add this line
+        ```
+    1. Run server: `python manage.py runserver`
+    1. Open browser and go to `http://localhost:8000/signin/`: `open http://localhost:8000/signin/`
+    1. Create a new user and create a new listing: `open http://localhost:8000/create/`
+

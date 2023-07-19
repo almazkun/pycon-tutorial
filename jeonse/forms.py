@@ -5,3 +5,4 @@ class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing
         fields = "__all__"
+        exclude = ["creator"]
