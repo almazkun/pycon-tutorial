@@ -1,6 +1,12 @@
-<h1>Listing List</h1>
-<ul>
-    {% for listing in object_list %}
-        <li><a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a></li>
-    {% endfor %}
-</ul>
+{% extends "base.html" %}
+
+{% block title %}Listing List{% endblock %}
+
+{% block content %}
+    <h1>Listing List</h1>
+    <ul>
+        {% for listing in object_list %}
+            <li><a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

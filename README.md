@@ -13,28 +13,30 @@ To enhance the search functionality, we will utilize django-filter to create adv
 Throughout the tutorial, we will provide clear and concise instructions, accompanied by code examples and demonstrations of each package's usage. By the end of the tutorial, you will have a fully functional rental listing website that showcases the power of Django and its community packages in creating modern, fast, and feature-rich web applications.
 
 ## Tutorial outline:
-1. Introduction
+1. [Introduction](#1-introduction)
     * Overview of the tutorial
     * Explanation of the application's purpose and functionality
-1. Prerequisites
+1. [Prerequisites](#2-prerequisites)
     * Django installation
     * Basic understanding of Django and Python
-1. Setting up the Project
+1. [Setting up the Project](#3-setting-up-the-project)
     * Creating a new Django project
     * Creating a new Django app for rental listings
-1. Setting up the Project
     * Install Python 3.8+ and Django 4.2
     * Create Django project
     * Custom user model
     * Create User Signup and Signin Views
     * Create Listing Model and Views
     * Configuring URL patterns for different views
-1. User Authentication and Permissions
+1. [User Authentication and Permissions](#4-user-authentication-and-permissions)
     * Restricting views and actions to authenticated users
     * Restricting views and actions to listing owners
-1. Styling with CSS
+1. [Styling with Bootstrap](#5-styling-with-bootstrap)
     * Adding CSS stylesheets to enhance the application's appearance
     * Applying responsive design principles for better user experience
+1. Adding Django-table
+1. Adding Django-filters
+1. Adding Django-htmx
 1. Testing the Application
     * Writing unit tests for models, views, and forms
     * Running tests to ensure the application functions correctly
@@ -45,8 +47,11 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
     * Recap of what was covered in the tutorial
     * Encouraging further exploration and enhancements to the application
 
+## Tutorial Presentation:
 ### 1. Introduction
+
 In this tutorial, we will build a rental listing website using Django, a popular Python web framework. The application will allow users to create and manage rental listings, as well as search for listings based on various criteria.
+
 ### 2. Prerequisites
 
 1. Python 3.8+ ([Python](https://www.python.org/downloads/))
@@ -56,6 +61,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
 1. Text Editor ([VS Code](https://code.visualstudio.com/) or any other editor of your choice)
 
 ### 3. Setting up the Project
+
 1. **Install Python 3.8+ and Django 4.2+**
 
     1. Install python: https://www.python.org/downloads/
@@ -66,7 +72,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Create virtual environment: `pipenv shell`
     1. Open this project in VS Code: `code .`
 
-2. **Create Django project**
+1. **Create Django project**
 
     1. Create Django project: `django-admin startproject settings .`
     1. Create Django app: `python manage.py startapp jeonse`
@@ -87,7 +93,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Run server: `python manage.py runserver`
     1. Open browser and go to `http://localhost:8000`: `open http://localhost:8000`
 
-3. **Custom user model**
+1. **Custom user model**
     1. Open `jeonse/models.py` and add `CustomUser` model:
         ```python
         from django.contrib.auth.models import AbstractUser
@@ -106,7 +112,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Run migrate: `python manage.py migrate`
     1. Run server: `python manage.py runserver`
 
-4. **Create User Signup and Signin Views**
+1. **Create User Signup and Signin Views**
     1. Install django-allauth: `pipenv install django-allauth==0.54.0`
     1. Add `allauth` to `INSTALLED_APPS` in `settings.py`:
         ```python
@@ -214,7 +220,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Open browser and go to `http://localhost:8000/accounts/logout/`: `open http://localhost:8000/accounts/logout/`
     1. Logout and login again
 
-5. **Create Listing Model and Views**
+1. **Create Listing Model and Views**
     1. Create `Listing model`:
         ```python
         # jeonse/models.py
@@ -336,7 +342,10 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Create a new listing: `open http://localhost:8000/create/`
     1. View the listing: `open http://localhost:8000/1/`
 
-6. **Restricting views and actions to creators**
+### 4. User Authentication and Permissions
+
+1. **Restricting views and actions to creators**
+
     1. Create `mixins.py`:
         ```bash
         touch jeonse/mixins.py
@@ -401,3 +410,166 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Open browser and go to `http://localhost:8000/signin/`: `open http://localhost:8000/signin/`
     1. Create a new user and create a new listing: `open http://localhost:8000/create/`
 
+### 5. Styling with Bootstrap
+
+1. **Adding Bootstrap**
+
+    1. Got to the https://getbootstrap.com/docs/5.3/getting-started/download/ website and copy the CDN links:
+        ```html
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+        ```
+    1. Create `base.html`, `navbar.html`, and `footer.html`:
+        ```bash
+        touch jeonse/templates/base.html jeonse/templates/navbar.html jeonse/templates/footer.html
+        ```
+        ```
+    1. Modify `base.html`:
+        ```html
+        <!-- jeonse/templates/base.html -->
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{% block title %}Jeonse{% endblock %}</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+        </head>
+
+        <body>
+            {% block navbar %}
+                {% include "navbar.html" %}
+            {% endblock %}
+            
+            {% block content %}
+            {% endblock %}
+
+            {% block footer %}
+                {% include "footer.html" %}
+            {% endblock %}
+        </body>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+        </html>
+        ```
+    1. Modify `navbar.html`:
+        ```html
+        <!-- jeonse/templates/navbar.html -->
+
+        <nav class="navbar bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'listing_list' %}">Jeonse</a>
+                <a class="nav-item" href="{% url 'listing_create' %}">Create Listing</a>
+                {% if user.is_authenticated %}
+                    <a class="nav-item" href="{% url 'account_logout' %}">Logout</a>
+                {% else %}
+                    <a class="nav-item" href="{% url 'account_login' %}">Login</a>
+                    <a class="nav-item" href="{% url 'account_signup' %}">Signup</a>
+                {% endif %}
+            </div>
+        </nav>
+        ```
+    1. Modify `footer.html`:
+        ```html
+        <!-- jeonse/templates/footer.html -->
+
+        <footer class="navbar bg-dark fixed-bottom">
+            <div class="container">
+                <a class="navbar-brand text-white" href="{% url 'listing_list' %}">Jeonse</a>
+            </div>
+        </footer>
+        ```
+    1. Modify `account\login.html`:
+        ```html
+        <!-- jeonse/templates/account/login.html -->
+
+        {% extends "base.html" %}
+
+        {% block title %}Login{% endblock %}
+
+        {% block content %}
+        <form method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+        {% endblock %}
+        ```
+    1. Modify `account\logout.html`:
+        ```html
+        <!-- jeonse/templates/account/logout.html -->
+
+        {% extends "base.html" %}
+
+        {% block title %}Logout{% endblock %}
+
+        {% block content %}
+        <form method="POST">{% csrf_token %}
+            <button class="btn btn-primary" type="submit">Logout</button>
+        </form>
+        {% endblock %}
+        ```
+    1. Modify `account\signup.html`:
+        ```html
+        <!-- jeonse/templates/account/signup.html -->
+
+        {% extends "base.html" %}
+
+        {% block title %}Signup{% endblock %}
+
+        {% block content %}
+        <form method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary" class="btn" type="submit">Signup</button>
+        </form>
+        {% endblock %}
+        ```
+    1. Modify `listing_create.html`:
+        ```html
+        <!-- jeonse/templates/listing_create.html -->
+
+        {% extends "base.html" %}
+
+        {% block title %}Listing Create{% endblock %}
+
+        {% block content %}
+        <h1>Listing Create</h1>
+        <form method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Create</button>
+        </form>
+        {% endblock %}
+        ```
+    1. Modify `listing_detail.html`:
+        ```html
+        <!-- jeonse/templates/listing_detail.html -->
+
+        {% extends "base.html" %}
+
+        {% block title %}Listing Detail{% endblock %}
+
+        {% block content %}
+        <h1>Listing Detail</h1>
+        <p>{{ object.creator }}</p>
+        <p>{{ object.jeonse_deposit_amount }}</p>
+        {% endblock %}
+        ```
+    1. Modify `listing_list.html`:
+        ```html
+        <!-- jeonse/templates/listing_list.html -->
+
+        {% extends "base.html" %}
+
+        {% block title %}Listing List{% endblock %}
+
+        {% block content %}
+            <h1>Listing List</h1>
+            <ul>
+                {% for listing in object_list %}
+                    <li><a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endblock %}
+        ```
+    1. Run server: `python manage.py runserver`
+    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
