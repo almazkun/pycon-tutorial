@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "jeonse",
     "allauth",
     "allauth.account",
+    "django_tables2",
 ]
 
 MIDDLEWARE = [

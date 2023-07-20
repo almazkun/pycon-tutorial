@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e011fdbdeab5464cc53b1aa8fa9c14987ae24ddb1be19cb1fde20b2585eec3e6"
+            "sha256": "4ad5f2a0bd33070699a05ff8a6c2026c96af88a7c96a178d6698bc956f91a0d8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -233,6 +233,14 @@
             "index": "pypi",
             "version": "==0.54.0"
         },
+        "django-tables2": {
+            "hashes": [
+                "sha256:04f23c1181d93716c67085a3c324b449180fd0c5162ef4619acb0b2d9a166133",
+                "sha256:479eed04007cc04bcf764a6fb7a5e3955d94b878ba7f3a4bd4edbd2f7769e08d"
+            ],
+            "index": "pypi",
+            "version": "==2.6.0"
+        },
         "idna": {
             "hashes": [
                 "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4",
@@ -261,11 +269,11 @@
                 "crypto"
             ],
             "hashes": [
-                "sha256:ba2b425b15ad5ef12f200dc67dd56af4e26de2331f965c5439994dad075876e1",
-                "sha256:bd6ca4a3c4285c1a2d4349e5a035fdf8fb94e04ccd0fcbe6ba289dae9cc3e074"
+                "sha256:57e28d156e3d5c10088e0c68abb90bfac3df82b40a71bd0daa20c65ccd5c23de",
+                "sha256:59127c392cc44c2da5bb3192169a91f429924e17aff6534d70fdc02ab3e04320"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==2.7.0"
+            "version": "==2.8.0"
         },
         "python3-openid": {
             "hashes": [
@@ -300,11 +308,11 @@
         },
         "urllib3": {
             "hashes": [
-                "sha256:48e7fafa40319d358848e1bc6809b208340fafe2096f1725d05d67443d0483d1",
-                "sha256:bee28b5e56addb8226c96f7f13ac28cb4c301dd5ea8a6ca179c0b9835e032825"
+                "sha256:8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11",
+                "sha256:de7df1803967d2c2a98e4b11bb7d6bd9210474c46e8a0401514e3a42a75ebde4"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==2.0.3"
+            "version": "==2.0.4"
         }
     },
     "develop": {}

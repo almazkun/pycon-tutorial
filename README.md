@@ -31,10 +31,9 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
 1. [User Authentication and Permissions](#4-user-authentication-and-permissions)
     * Restricting views and actions to authenticated users
     * Restricting views and actions to listing owners
-1. [Styling with Bootstrap](#5-styling-with-bootstrap)
+1. [Styling and Appearance](#5-styling-and-appearance)
     * Adding CSS stylesheets to enhance the application's appearance
-    * Applying responsive design principles for better user experience
-1. Adding Django-table
+    * Adding django-tables2 to display rental listings in a table
 1. Adding Django-filters
 1. Adding Django-htmx
 1. Testing the Application
@@ -410,7 +409,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Open browser and go to `http://localhost:8000/signin/`: `open http://localhost:8000/signin/`
     1. Create a new user and create a new listing: `open http://localhost:8000/create/`
 
-### 5. Styling with Bootstrap
+### 5. Styling and Appearance
 
 1. **Adding Bootstrap**
 
@@ -569,6 +568,85 @@ In this tutorial, we will build a rental listing website using Django, a popular
                     <li><a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a></li>
                 {% endfor %}
             </ul>
+        {% endblock %}
+        ```
+    1. Run server: `python manage.py runserver`
+    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+
+1. **Adding django-tables2**
+
+    1. Install django-tables2: `pipenv install django-tables2==2.6.0`
+    1. Add `django_tables2` to `INSTALLED_APPS` in `settings.py`:
+        ```python
+        # settings.py
+
+        INSTALLED_APPS = [
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+            "jeonse",
+            "allauth",
+            "allauth.account",
+            "django_tables2",                   # <-- Add this line
+        ]
+        ```
+    1. Create `tables.py`:
+        ```bash
+        touch jeonse/tables.py
+        ```
+    1. Add `ListingTable` to `jeonse/tables.py`:
+        ```python
+        # jeonse/tables.py
+
+        import django_tables2 as tables
+
+        from jeonse.models import Listing
+
+        class ListingTable(tables.Table):
+            class Meta:
+                model = Listing
+                template_name = "django_tables2/bootstrap5.html"
+        ```
+    1. Modify `jeonse/views.py`:
+        ```python
+        # jeonse/views.py
+
+        from django_tables2 import SingleTableView
+
+        from django.contrib.auth.mixins import LoginRequiredMixin
+        from django.urls import reverse_lazy
+        from django.views.generic import DetailView, CreateView
+
+        from jeonse.forms import ListingForm
+        from jeonse.mixins import UserIsCreatorMixin
+        from jeonse.models import Listing
+        from jeonse.tables import ListingTable
+
+
+        class ListingListView(LoginRequiredMixin, SingleTableView):
+            model = Listing
+            template_name = "listing_list.html"
+            table_class = ListingTable
+
+            def get_queryset(self):
+                return Listing.objects.filter(creator=self.request.user)
+        ...
+        ```
+    1. Modify `listing_list.html`:
+        ```html
+        <!-- jeonse/templates/listing_list.html -->
+
+        {% extends "base.html" %}
+        {% load render_table from django_tables2 %}
+
+        {% block title %}Listing List{% endblock %}
+
+        {% block content %}
+            <h1>Listing List</h1>
+            {% render_table table %}
         {% endblock %}
         ```
     1. Run server: `python manage.py runserver`

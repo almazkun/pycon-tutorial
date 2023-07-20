@@ -1,14 +1,19 @@
-from django.views.generic import ListView, DetailView, CreateView
-from django.urls import reverse_lazy
-from jeonse.forms import ListingForm
-from jeonse.models import Listing
+from django_tables2 import SingleTableView
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, CreateView
+
+from jeonse.forms import ListingForm
 from jeonse.mixins import UserIsCreatorMixin
+from jeonse.models import Listing
+from jeonse.tables import ListingTable
 
 
-class ListingListView(LoginRequiredMixin, ListView):
+class ListingListView(LoginRequiredMixin, SingleTableView):
     model = Listing
     template_name = "listing_list.html"
+    table_class = ListingTable
 
     def get_queryset(self):
         return Listing.objects.filter(creator=self.request.user)
