@@ -1,19 +1,22 @@
 from django_tables2 import SingleTableView
+from django_filters.views import FilterView
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView
 
+from jeonse.filters import ListingFilter
 from jeonse.forms import ListingForm
 from jeonse.mixins import UserIsCreatorMixin
 from jeonse.models import Listing
 from jeonse.tables import ListingTable
 
 
-class ListingListView(LoginRequiredMixin, SingleTableView):
+class ListingListView(LoginRequiredMixin, FilterView, SingleTableView):
     model = Listing
     template_name = "listing_list.html"
     table_class = ListingTable
+    filterset_class = ListingFilter
 
     def get_queryset(self):
         return Listing.objects.filter(creator=self.request.user)

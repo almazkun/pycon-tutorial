@@ -5,5 +5,9 @@
 
 {% block content %}
     <h1>Listing List</h1>
+    <form method="GET">
+        {{ filter.form.as_p }}
+        <button type="submit">Search</button>
+    </form>
     {% render_table table %}
 {% endblock %}

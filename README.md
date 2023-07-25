@@ -34,7 +34,8 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
 1. [Styling and Appearance](#5-styling-and-appearance)
     * Adding CSS stylesheets to enhance the application's appearance
     * Adding django-tables2 to display rental listings in a table
-1. Adding Django-filters
+1. [Search and Filtering](#6-search-and-filtering)
+    * Adding django-filter to enable advanced search and filtering
 1. Adding Django-htmx
 1. Testing the Application
     * Writing unit tests for models, views, and forms
@@ -646,6 +647,92 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
         {% block content %}
             <h1>Listing List</h1>
+            {% render_table table %}
+        {% endblock %}
+        ```
+    1. Run server: `python manage.py runserver`
+    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+
+### 6. Search and Filtering
+
+1. **Adding django-filter to enable advanced search and filtering**
+
+    1. Install django-filter: `pipenv install django-filter==23.2`
+    1. Add `django_filters` to `INSTALLED_APPS` in `settings.py`:
+        ```python
+        # settings.py
+
+        INSTALLED_APPS = [
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+            "jeonse",
+            "allauth",
+            "allauth.account",
+            "django_tables2",
+            "django_filters",                   # <-- Add this line
+        ]
+        ```
+    1. Create `jeonse/filters.py`:
+        ```bash
+        touch jeonse/filters.py
+        ```
+    1. Add `ListingFilter` to `jeonse/filters.py`:
+        ```python
+        # jeonse/filters.py
+
+        import django_filters
+
+        from jeonse.models import Listing
+
+
+        class ListingFilter(django_filters.FilterSet):
+            
+            class Meta:
+                model = Listing
+                fields = {
+                    "jeonse_deposit_amount": ["lte",],
+                    "wolse_deposit_amount": ["lte",],
+                    "total_monthly_payment": ["lte",],
+                }
+        ```
+    1. Modify `jeonse/views.py`:
+        ```python
+        # jeonse/views.py
+
+        ...
+        from django_filters.views import FilterView
+        from jeonse.filters import ListingFilter
+        ...
+        
+        class ListingListView(LoginRequiredMixin, SingleTableView, FilterView):
+            model = Listing
+            template_name = "listing_list.html"
+            table_class = ListingTable
+            filterset_class = ListingFilter
+
+            def get_queryset(self):
+                return Listing.objects.filter(creator=self.request.user)
+        ...
+        ```
+    1. Modify `listing_list.html`:
+        ```html
+        <!-- jeonse/templates/listing_list.html -->
+
+        {% extends "base.html" %}
+        {% load render_table from django_tables2 %}
+
+        {% block title %}Listing List{% endblock %}
+
+        {% block content %}
+            <h1>Listing List</h1>
+            <form method="GET">
+                {{ filter.form.as_p }}
+                <button type="submit">Search</button>
+            </form>
             {% render_table table %}
         {% endblock %}
         ```
