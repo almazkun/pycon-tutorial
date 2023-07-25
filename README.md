@@ -36,7 +36,9 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
     * Adding django-tables2 to display rental listings in a table
 1. [Search and Filtering](#6-search-and-filtering)
     * Adding django-filter to enable advanced search and filtering
-1. Adding Django-htmx
+1. [Request optimization](#7-request-optimization)
+    * Adding django-htmx to optimize user interactions
+
 1. Testing the Application
     * Writing unit tests for models, views, and forms
     * Running tests to ensure the application functions correctly
@@ -735,6 +737,99 @@ In this tutorial, we will build a rental listing website using Django, a popular
             </form>
             {% render_table table %}
         {% endblock %}
+        ```
+    1. Run server: `python manage.py runserver`
+    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+
+### 7. Request optimization
+
+1. **Adding django-htmx to optimize user interactions**
+
+    1. Install `django-htmx`: `pipenv install django-htmx==1.16.0`
+    1. Add `django_htmx` to `INSTALLED_APPS` in `settings.py`:
+        ```python
+        # settings.py
+
+        INSTALLED_APPS = [
+            ...
+            "django_htmx",                         # <-- Add this line
+        ]
+        ```
+    1. Add `django_htmx.middleware.HtmxMiddleware` middleware:
+        ```python
+        # settings.py
+        
+        MIDDLEWARE = [
+            ...
+            "django_htmx.middleware.HtmxMiddleware", # <-- Add this line
+        ]
+        ```
+    1. Add `id="content"` to `base.html`:
+        ```html
+        <!-- jeonse/templates/base.html -->
+
+        <div id="content" class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+        ```
+    1. Add `<script src="https://unpkg.com/htmx.org@1.9.3" integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua" crossorigin="anonymous"></script>` to `base.html` as the last line:
+        ```html
+        <!-- jeonse/templates/base.html -->
+        <div id="content" class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+        ...
+        <script src="https://unpkg.com/htmx.org@1.9.3" integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua" crossorigin="anonymous"></script>
+        </html>
+        ```
+    1. Create directory for `htmx` templates:
+        ```bash
+        mkdir jeonse/templates/htmx
+        ```
+    1. Create `htmx/listing_list.html`:
+        ```bash
+        touch jeonse/templates/htmx/listing_list.html
+        ```
+    1. Modify `htmx/listing_list.html`:
+        ```html
+        <!-- jeonse/templates/htmx/listing_list.html -->
+
+        {% load render_table from django_tables2 %}
+
+        <h1>Listing List</h1>
+        <form hx-get="" hx-target="#content">
+            {{ filter.form.as_p }}
+            <button type="submit">Search</button>
+        </form>
+        {% render_table table %}
+        ```
+    1. Modify `templates/listing_list.html`:
+        ```html
+        <!-- jeonse/templates/listing_list.html -->
+
+        {% extends "base.html" %}
+
+        {% block title %}Listing List{% endblock %}
+
+        {% block content %}
+            {% include "htmx/listing_list.html" %}
+        {% endblock %}
+        ```
+    1. Modify `ListingListView` in `jeonse/views.py`:
+        ```python
+        # jeonse/views.py
+
+        ...
+        class ListingListView(LoginRequiredMixin, FilterView, SingleTableView):
+            ...
+
+            def get_template_names(self) -> List[str]:
+                if self.request.htmx:
+                    return ["htmx/listing_list.html"]
+                return super().get_template_names()
+        ...
         ```
     1. Run server: `python manage.py runserver`
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`

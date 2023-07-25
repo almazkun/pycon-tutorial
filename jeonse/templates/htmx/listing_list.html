@@ -1,0 +1,8 @@
+{% load render_table from django_tables2 %}
+
+<h1>Listing List</h1>
+<form hx-get="" hx-target="#content">
+    {{ filter.form.as_p }}
+    <button type="submit">Search</button>
+</form>
+{% render_table table %}

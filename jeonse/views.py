@@ -1,3 +1,4 @@
+from typing import List
 from django_tables2 import SingleTableView
 from django_filters.views import FilterView
 
@@ -20,6 +21,11 @@ class ListingListView(LoginRequiredMixin, FilterView, SingleTableView):
 
     def get_queryset(self):
         return Listing.objects.filter(creator=self.request.user)
+
+    def get_template_names(self) -> List[str]:
+        if self.request.htmx:
+            return ["htmx/listing_list.html"]
+        return super().get_template_names()
 
 
 class ListingDetailView(LoginRequiredMixin, UserIsCreatorMixin, DetailView):
