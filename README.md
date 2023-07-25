@@ -708,7 +708,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         from jeonse.filters import ListingFilter
         ...
         
-        class ListingListView(LoginRequiredMixin, SingleTableView, FilterView):
+        class ListingListView(LoginRequiredMixin, FilterView, SingleTableView):
             model = Listing
             template_name = "listing_list.html"
             table_class = ListingTable
