@@ -612,6 +612,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             class Meta:
                 model = Listing
                 template_name = "django_tables2/bootstrap5.html"
+                attrs = {"class": "table table-striped table-bordered table-hover"}
         ```
     1. Modify `jeonse/views.py`:
         ```python
@@ -649,7 +650,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
         {% block content %}
             <h1>Listing List</h1>
-            {% render_table table %}
+            <div class="overflow-auto">
+                {% render_table table %}
+            </div>
         {% endblock %}
         ```
     1. Run server: `python manage.py runserver`

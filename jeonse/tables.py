@@ -6,3 +6,4 @@ class ListingTable(tables.Table):
     class Meta:
         model = Listing
         template_name = "django_tables2/bootstrap5.html"
+        attrs = {"class": "table table-striped table-bordered table-hover"}
