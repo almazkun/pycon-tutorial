@@ -12,6 +12,7 @@ To enhance the search functionality, we will utilize django-filter to create adv
 
 Throughout the tutorial, we will provide clear and concise instructions, accompanied by code examples and demonstrations of each package's usage. By the end of the tutorial, you will have a fully functional rental listing website that showcases the power of Django and its community packages in creating modern, fast, and feature-rich web applications.
 
+
 ## Tutorial outline:
 1. [Introduction](#1-introduction)
     * Overview of the tutorial
@@ -38,8 +39,7 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
     * Adding django-filter to enable advanced search and filtering
 1. [Request optimization](#7-request-optimization)
     * Adding django-htmx to optimize user interactions
-
-1. Testing the Application
+1. [Testing the Application](#8-testing-the-application)
     * Writing unit tests for models, views, and forms
     * Running tests to ensure the application functions correctly
 1. Deployment
@@ -48,6 +48,7 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
 1. Conclusion
     * Recap of what was covered in the tutorial
     * Encouraging further exploration and enhancements to the application
+
 
 ## Tutorial Presentation:
 ### 1. Introduction
@@ -836,3 +837,207 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ```
     1. Run server: `python manage.py runserver`
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+
+### 8. Testing the Application
+
+1. Add `django.test.TestCase` to `jeonse/tests.py`:
+    ```python
+    # jeonse/tests.py
+
+    from django.test import TestCase
+
+    class TestViews(TestCase):
+        def setUp(self):
+            pass
+
+        def test_account_login(self):
+            pass
+
+        def test_account_logout(self):
+            pass
+        
+        def test_account_signup(self):
+            pass
+
+        def test_listing_list(self):
+            pass
+
+        def test_listing_detail(self):
+            pass
+
+        def test_listing_create(self):
+            pass
+    ```
+1. Add `test_account_login` to `jeonse/tests.py`:
+    ```python
+    # jeonse/tests.py
+
+    def setUp(self):    
+        self.user_kwargs = {
+            'username': 'testuser',
+            'email': 'testuser@gmail.com',
+            'password': 'testpassword',
+        }
+
+    def test_account_login(self):
+        post_data = {
+            'login': self.user_kwargs['email'],
+            'password': self.user_kwargs['password'],
+        }
+        endpoint = reverse('account_login')
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/login.html')
+
+        response = self.client.post(endpoint, post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/login.html')
+        self.assertTrue(response.context['form'].errors)
+
+        get_user_model().objects.create_user(**self.user_kwargs)
+        response = self.client.post(endpoint, post_data)
+        self.assertRedirects(response, reverse('listing_list'))
+    ```
+1. Add `test_account_logout` to `jeonse/tests.py`:
+    ```python
+    # jeonse/tests.py
+
+    def test_account_logout(self):
+        user = get_user_model().objects.create_user(**self.user_kwargs)
+
+        endpoint = reverse('account_logout')
+        response = self.client.post(endpoint)
+        self.assertFalse(response.context)
+
+        self.client.force_login(user)
+        response = self.client.post(endpoint)
+        self.assertTrue(response.context['user'].is_authenticated)
+    ```
+
+1. Add `test_account_signup` to `jeonse/tests.py`:
+    ```python
+    # jeonse/tests.py
+
+    def test_account_signup(self):
+        post_data = {
+            'email': self.user_kwargs['email'],
+            'password1': self.user_kwargs['password'],
+            'password2': self.user_kwargs['password'],
+        }
+        endpoint = reverse('account_signup')
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/signup.html')
+
+        endpoint = reverse('account_signup')
+        response = self.client.post(endpoint, post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.context['user'].is_authenticated)
+
+        user = get_user_model().objects.get(email=self.user_kwargs['email'])
+        self.assertTrue(user.is_active)
+        self.assertEqual(user.email, self.user_kwargs['email'])
+    ```
+
+1. Add `test_listing_list` to `jeonse/tests.py`:
+    ```python
+    # jeonse/tests.py
+
+    def test_listing_list(self):
+        user = get_user_model().objects.create_user(**self.user_kwargs)
+        for i in range(10):
+            Listing.objects.create(
+                creator=user,
+                jeonse_deposit_amount=i,
+                wolse_deposit_amount=i,
+                wolse_monthly_amount=i,
+                gwanlibi_monthly_amount=i,
+                loan_amount=i,
+                loan_interest_rate=i,
+                total_monthly_payment=i,
+                total_area=i,
+                number_of_rooms=i,
+                number_of_bathrooms=i,
+                comment=f"comment{i}",
+            )
+        endpoint = reverse('listing_list')
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('account_login') + f'?next={endpoint}')
+
+        self.client.force_login(user)
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'listing_list.html')
+        self.assertEqual(len(response.context['object_list']), 10)
+    ```
+
+1. Add `test_listing_detail` to `jeonse/tests.py`:
+    ```python
+    # jeonse/tests.py
+
+    def test_listing_detail(self):
+        user = get_user_model().objects.create_user(**self.user_kwargs)
+        listing = Listing.objects.create(
+            creator=user,
+            jeonse_deposit_amount=1,
+            wolse_deposit_amount=1,
+            wolse_monthly_amount=1,
+            gwanlibi_monthly_amount=1,
+            loan_amount=1,
+            loan_interest_rate=1,
+            total_monthly_payment=1,
+            total_area=1,
+            number_of_rooms=1,
+            number_of_bathrooms=1,
+            comment="comment",
+        )
+        endpoint = reverse('listing_detail', kwargs={'pk': listing.pk})
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('account_login') + f'?next={endpoint}')
+
+        self.client.force_login(user)
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'listing_detail.html')
+        self.assertEqual(response.context['object'], listing)
+    ```
+
+1. Add `test_listing_create` to `jeonse/tests.py`:
+    ```python
+    # jeonse/tests.py
+
+    def test_listing_create(self):
+        user = get_user_model().objects.create_user(**self.user_kwargs)
+        endpoint = reverse('listing_create')
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('account_login') + f'?next={endpoint}')
+
+        self.client.force_login(user)
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'listing_create.html')
+
+        post_data = {
+            'jeonse_deposit_amount': 1,
+            'wolse_deposit_amount': 1,
+            'wolse_monthly_amount': 1,
+            'gwanlibi_monthly_amount': 1,
+            'loan_amount': 1,
+            'loan_interest_rate': 1,
+            'total_monthly_payment': 1,
+            'total_area': 1,
+            'number_of_rooms': 1,
+            'number_of_bathrooms': 1,
+            'comment': "comment",
+        }
+        response = self.client.post(endpoint, post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('listing_list'))
+        self.assertEqual(Listing.objects.count(), 1)
+    ```
+
+1. Run tests: `python manage.py test`
+    
