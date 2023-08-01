@@ -42,9 +42,9 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
 1. [Testing the Application](#8-testing-the-application)
     * Writing unit tests for models, views, and forms
     * Running tests to ensure the application functions correctly
-1. Deployment
-    * Preparing the application for deployment
-    * Deploying the Django application to a web server or hosting platform (optional)
+1. [Deployment](#9-deployment)
+    * Create ngrok account and download ngrok.
+    * Run ngrok to expose local server to the internet
 1. Conclusion
     * Recap of what was covered in the tutorial
     * Encouraging further exploration and enhancements to the application
@@ -78,10 +78,10 @@ In this tutorial, we will build a rental listing website using Django, a popular
 1. **Create Django project**
 
     1. Create Django project: `django-admin startproject settings .`
-    1. Create Django app: `python manage.py startapp jeonse`
-    1. Add `jeonse` to `INSTALLED_APPS` in `settings.py`:
+    1. Create Django app: `python3 manage.py startapp jeonse`
+    1. Add `jeonse` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
-        # settings.py
+        # settings/settings.py
 
         INSTALLED_APPS = [
             "django.contrib.admin",
@@ -93,7 +93,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             "jeonse"                        # <-- Add this line
         ]
         ```
-    1. Run server: `python manage.py runserver`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000`: `open http://localhost:8000`
 
 1. **Custom user model**
@@ -107,19 +107,19 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ```
     1. Add `AUTH_USER_MODEL = 'jeonse.CustomUser'` to `settings.py`
         ```python
-        # settings.py
+        # settings/settings.py
 
         AUTH_USER_MODEL = 'jeonse.CustomUser'
         ```
-    1. Run makemigrations: `python manage.py makemigrations`
-    1. Run migrate: `python manage.py migrate`
-    1. Run server: `python manage.py runserver`
+    1. Run makemigrations: `python3 manage.py makemigrations`
+    1. Run migrate: `python3 manage.py migrate`
+    1. Run server: `python3 manage.py runserver`
 
 1. **Create User Signup and Signin Views**
     1. Install django-allauth: `pipenv install django-allauth==0.54.0`
-    1. Add `allauth` to `INSTALLED_APPS` in `settings.py`:
+    1. Add `allauth` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
-        # settings.py
+        # settings/settings.py
 
         INSTALLED_APPS = [
             "django.contrib.admin",
@@ -134,9 +134,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ]
         ```
     1. Add `'django.template.context_processors.request'` to `TEMPLATES`
-    1. Add `AUTHENTICATION_BACKENDS` in `settings.py`:
+    1. Add `AUTHENTICATION_BACKENDS` in `settings/settings.py`:
         ```python
-        # settings.py
+        # settings/settings.py
 
         # django-allauth settings
         # https://django-allauth.readthedocs.io/en/latest/installation.html
@@ -145,9 +145,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
             'allauth.account.auth_backends.AuthenticationBackend',
         ]
         ```
-    1. Configure Allauth settings in `settings.py`:
+    1. Configure Allauth settings in `settings/settings.py`:
         ```python
-        # settings.py
+        # settings/settings.py
 
         # https://django-allauth.readthedocs.io/en/latest/configuration.html
         ACCOUNT_USERNAME_REQUIRED = False
@@ -215,9 +215,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
             path('', include('jeonse.urls')), # <-- Add this line
         ]
         ```
-    1. Run makemigrations: `python manage.py makemigrations`
-    1. Run migrate: `python manage.py migrate`
-    1. Run server: `python manage.py runserver`
+    1. Run makemigrations: `python3 manage.py makemigrations`
+    1. Run migrate: `python3 manage.py migrate`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000/accounts/signup/`: `open http://localhost:8000/accounts/signup/`
     1. Create a new user and login
     1. Open browser and go to `http://localhost:8000/accounts/logout/`: `open http://localhost:8000/accounts/logout/`
@@ -338,9 +338,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ]
         ```
     
-    1. Run makemigrations: `python manage.py makemigrations`
-    1. Run migrate: `python manage.py migrate`
-    1. Run server: `python manage.py runserver`
+    1. Run makemigrations: `python3 manage.py makemigrations`
+    1. Run migrate: `python3 manage.py migrate`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
     1. Create a new listing: `open http://localhost:8000/create/`
     1. View the listing: `open http://localhost:8000/1/`
@@ -409,7 +409,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
                 fields = "__all__"
                 exclude = ["creator"]  # <-- Add this line
         ```
-    1. Run server: `python manage.py runserver`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000/signin/`: `open http://localhost:8000/signin/`
     1. Create a new user and create a new listing: `open http://localhost:8000/create/`
 
@@ -574,15 +574,15 @@ In this tutorial, we will build a rental listing website using Django, a popular
             </ul>
         {% endblock %}
         ```
-    1. Run server: `python manage.py runserver`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
 
 1. **Adding django-tables2**
 
     1. Install django-tables2: `pipenv install django-tables2==2.6.0`
-    1. Add `django_tables2` to `INSTALLED_APPS` in `settings.py`:
+    1. Add `django_tables2` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
-        # settings.py
+        # settings/settings.py
 
         INSTALLED_APPS = [
             "django.contrib.admin",
@@ -656,7 +656,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             </div>
         {% endblock %}
         ```
-    1. Run server: `python manage.py runserver`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
 
 ### 6. Search and Filtering
@@ -664,9 +664,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
 1. **Adding django-filter to enable advanced search and filtering**
 
     1. Install django-filter: `pipenv install django-filter==23.2`
-    1. Add `django_filters` to `INSTALLED_APPS` in `settings.py`:
+    1. Add `django_filters` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
-        # settings.py
+        # settings/settings.py
 
         INSTALLED_APPS = [
             "django.contrib.admin",
@@ -742,7 +742,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             {% render_table table %}
         {% endblock %}
         ```
-    1. Run server: `python manage.py runserver`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
 
 ### 7. Request optimization
@@ -750,18 +750,18 @@ In this tutorial, we will build a rental listing website using Django, a popular
 1. **Adding django-htmx to optimize user interactions**
 
     1. Install `django-htmx`: `pipenv install django-htmx==1.16.0`
-    1. Add `django_htmx` to `INSTALLED_APPS` in `settings.py`:
+    1. Add `django_htmx` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
-        # settings.py
+        # settings/settings.py
 
         INSTALLED_APPS = [
             ...
-            "django_htmx",                         # <-- Add this line
+            "django_htmx",                           # <-- Add this line
         ]
         ```
     1. Add `django_htmx.middleware.HtmxMiddleware` middleware:
         ```python
-        # settings.py
+        # settings/settings.py
         
         MIDDLEWARE = [
             ...
@@ -835,7 +835,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
                 return super().get_template_names()
         ...
         ```
-    1. Run server: `python manage.py runserver`
+    1. Run server: `python3 manage.py runserver`
     1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
 
 ### 8. Testing the Application
@@ -1039,5 +1039,29 @@ In this tutorial, we will build a rental listing website using Django, a popular
         self.assertEqual(Listing.objects.count(), 1)
     ```
 
-1. Run tests: `python manage.py test`
+1. Run tests: `python3 manage.py test`
     
+
+### 9. Deployment
+1. Go to `https://ngrok.com` and create account.
+1. Verify your email address.
+1. Open `https://dashboard.ngrok.com/get-started/setup`
+1. Download `ngrok`. 
+1. Authenticate: `path/to/ngrok config add-authtoken SomeRand0mstr1ng`
+1. Run `ngrok`: `path/to/ngrok http 8000`
+1. Copy the forwarding link to `ALLOWED_HOSTS` in `settings/settings.py`:
+    ```python
+    # settings/settings.py
+
+    ALLOWED_HOSTS = [
+        "25ba-14-52-118-121.ngrok-free.app"
+    ]
+    ```
+1. Copy thy forwarding link to `CSRF_TRUSTED_ORIGINS` in `settings/settings.py`:
+    ```python
+    # settings/settings.py
+
+    CSRF_TRUSTED_ORIGINS = ["https://25ba-14-52-118-121.ngrok-free.app"]
+    ```
+1. Run server: `python3 manage.py runserver`
+1. Open browser and go to `https://25ba-14-52-118-121.ngrok-free.app/`: `open https://25ba-14-52-118-121.ngrok-free.app/`
