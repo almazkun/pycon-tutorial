@@ -70,7 +70,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Install python: https://www.python.org/downloads/
     1. Make a directory for the project: `mkdir django-jeonse`
     1. Change directory to the project: `cd django-jeonse`
-    1. Install pipenv (we will use it for virtual environment): `pip install pipenv`
+    1. Install pipenv (we will use it for virtual environment): `pip3 install pipenv`
     1. Install Django: `pipenv install django==4.2.3`
     1. Create virtual environment: `pipenv shell`
     1. Open this project in VS Code: `code .`
