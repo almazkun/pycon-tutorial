@@ -5,10 +5,6 @@ name = "pypi"
 
 [packages]
 django = "==4.2.3"
-django-allauth = "==0.54.0"
-django-tables2 = "==2.6.0"
-django-filter = "==23.2"
-django-htmx = "==1.16.0"
 
 [dev-packages]
 
