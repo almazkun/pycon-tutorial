@@ -71,7 +71,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Make a directory for the project: `mkdir django-jeonse`
     1. Change directory to the project: `cd django-jeonse`
     1. Install pipenv (we will use it for virtual environment): `pip3 install pipenv`
-    1. Install Django: `pipenv install django==4.2.3`
+    1. Install Django: `pipenv install django==4.2.4`
     1. Create virtual environment: `pipenv shell`
     1. Open this project in VS Code: `code .`
 
@@ -90,7 +90,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             "django.contrib.sessions",
             "django.contrib.messages",
             "django.contrib.staticfiles",
-            "jeonse"                        # <-- Add this line
+            "jeonse",                                       # <-- Add this line
         ]
         ```
     1. Run server: `python3 manage.py runserver`
@@ -105,7 +105,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         class CustomUser(AbstractUser):
             pass
         ```
-    1. Add `AUTH_USER_MODEL = 'jeonse.CustomUser'` to `settings.py`
+    1. Add `AUTH_USER_MODEL = 'jeonse.CustomUser'` to `settings/settings.py`
         ```python
         # settings/settings.py
 
@@ -117,7 +117,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
 1. **Create User Signup and Signin Views**
     1. Install django-allauth: `pipenv install django-allauth==0.54.0`
-    1. Add `allauth` to `INSTALLED_APPS` in `settings/settings.py`:
+    1. Add `allauth` and `allauth.account` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
         # settings/settings.py
 
@@ -133,7 +133,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
             "allauth.account",                  # <-- Add this line
         ]
         ```
-    1. Add `'django.template.context_processors.request'` to `TEMPLATES`
     1. Add `AUTHENTICATION_BACKENDS` in `settings/settings.py`:
         ```python
         # settings/settings.py
@@ -141,11 +140,11 @@ In this tutorial, we will build a rental listing website using Django, a popular
         # django-allauth settings
         # https://django-allauth.readthedocs.io/en/latest/installation.html
         AUTHENTICATION_BACKENDS = [
-            'django.contrib.auth.backends.ModelBackend',
-            'allauth.account.auth_backends.AuthenticationBackend',
+            "django.contrib.auth.backends.ModelBackend",
+            "allauth.account.auth_backends.AuthenticationBackend",
         ]
         ```
-    1. Configure Allauth settings in `settings/settings.py`:
+    1. Configure `Allauth` settings in `settings/settings.py`:
         ```python
         # settings/settings.py
 
@@ -155,20 +154,25 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ACCOUNT_EMAIL_REQUIRED = True
         ACCOUNT_UNIQUE_EMAIL = True
         ACCOUNT_EMAIL_VERIFICATION = "none"
+        LOGIN_REDIRECT_URL = "/"
         ```
-    1. Create `urls.py` in `jeonse` app: `touch jeonse/urls.py`
+    1. Create `urls.py` in `jeonse` app:
+        ```bash
+        touch jeonse/urls.py
+        ```
     1. Create `account_login`, `account_logout`, and `account_signup` URLs in `jeonse/urls.py`:
         ```python
         # jeonse/urls.py
 
-        from django.urls import path
         from allauth.account import views as allauth_views
+        from django.urls import path
 
         urlpatterns = [
-            path('accounts/login/', allauth_views.LoginView.as_view(), name='account_login'),
-            path('accounts/logout/', allauth_views.LogoutView.as_view(), name='account_logout'),
-            path('accounts/signup/', allauth_views.SignupView.as_view(), name='account_signup'),
+            path("accounts/login/", allauth_views.LoginView.as_view(), name="account_login"),
+            path("accounts/logout/", allauth_views.LogoutView.as_view(), name="account_logout"),
+            path("accounts/signup/", allauth_views.SignupView.as_view(), name="account_signup"),
         ]
+
         ```
     1. Create templated:
         ```
@@ -208,11 +212,11 @@ In this tutorial, we will build a rental listing website using Django, a popular
         # settings/urls.py
 
         from django.contrib import admin
-        from django.urls import path, include # <-- Add this line
+        from django.urls import path, include  # <-- Add this line  
 
         urlpatterns = [
-            path('admin/', admin.site.urls),
-            path('', include('jeonse.urls')), # <-- Add this line
+            path("admin/", admin.site.urls),
+            path("", include("jeonse.urls")),  # <-- Add this line
         ]
         ```
     1. Run makemigrations: `python3 manage.py makemigrations`
