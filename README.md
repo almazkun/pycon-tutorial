@@ -1290,7 +1290,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         response = self.client.post(endpoint)
         self.assertTrue(response.context["user"].is_authenticated)
     ```
-
 1. Add `test_account_signup` to `jeonse/tests.py`:
     ```python
     # jeonse/tests.py
@@ -1315,7 +1314,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         self.assertTrue(user.is_active)
         self.assertEqual(user.email, self.user_kwargs["email"])
     ```
-
 1. Add `test_listing_list` to `jeonse/tests.py`:
     ```python
     # jeonse/tests.py
@@ -1347,7 +1345,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         self.assertTemplateUsed(response, "jeonse/listing_list.html")
         self.assertEqual(len(response.context["object_list"]), 10)
     ```
-
 1. Add `test_listing_detail` to `jeonse/tests.py`:
     ```python
     # jeonse/tests.py
@@ -1378,7 +1375,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         self.assertTemplateUsed(response, "jeonse/listing_detail.html")
         self.assertEqual(response.context["object"], listing)
     ```
-
 1. Add `test_listing_create` to `jeonse/tests.py`:
     ```python
     # jeonse/tests.py
@@ -1452,30 +1448,38 @@ In this tutorial, we will build a rental listing website using Django, a popular
             ),
         )
     ```
-
-1. Run tests: `python3 manage.py test`
-    
+1. Run tests: 
+    ```bash
+    python3 manage.py test
+    ```
 
 ### 9. Deployment
-1. Go to `https://ngrok.com` and create account.
+
+1. Go to https://ngrok.com and create account.
 1. Verify your email address.
-1. Open `https://dashboard.ngrok.com/get-started/setup`
-1. Download `ngrok`. 
-1. Authenticate: `path/to/ngrok config add-authtoken SomeRand0mstr1ng`
-1. Run `ngrok`: `path/to/ngrok http 8000`
+1. Download [ngrok](https://ngrok.com/download) 
+1. Open https://dashboard.ngrok.com/get-started/setup and copy the authtoken:
+    ```bash
+    path/to/ngrok config add-authtoken SomeRand0mStr1ng
+    ```
+1. Run `ngrok`:
+    ```bash
+    path/to/ngrok http 8000
+    ```
 1. Copy the forwarding link to `ALLOWED_HOSTS` in `settings/settings.py`:
     ```python
     # settings/settings.py
 
-    ALLOWED_HOSTS = [
-        "25ba-14-52-118-121.ngrok-free.app"
-    ]
+    ALLOWED_HOSTS = ["localhost", "25ba-14-52-118-121.ngrok-free.app"]
     ```
 1. Copy thy forwarding link to `CSRF_TRUSTED_ORIGINS` in `settings/settings.py`:
     ```python
     # settings/settings.py
 
-    CSRF_TRUSTED_ORIGINS = ["https://25ba-14-52-118-121.ngrok-free.app"]
+    CSRF_TRUSTED_ORIGINS = ["localhost", "https://25ba-14-52-118-121.ngrok-free.app"]
     ```
-1. Run server: `python3 manage.py runserver`
-1. Open browser and go to `https://25ba-14-52-118-121.ngrok-free.app/`: `open https://25ba-14-52-118-121.ngrok-free.app/`
+1. Run server: 
+    ```bash
+    python3 manage.py runserver
+    ```
+1. Open browser and go to https://25ba-14-52-118-121.ngrok-free.app/
