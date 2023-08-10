@@ -30,8 +30,7 @@ Throughout the tutorial, we will provide clear and concise instructions, accompa
     * Create Listing Model and Views
     * Configuring URL patterns for different views
 1. [User Authentication and Permissions](#4-user-authentication-and-permissions)
-    * Restricting views and actions to authenticated users
-    * Restricting views and actions to listing owners
+    * Restricting views and actions to authenticated users and listing creator's objects
 1. [Styling and Appearance](#5-styling-and-appearance)
     * Adding CSS stylesheets to enhance the application's appearance
     * Adding django-tables2 to display rental listings in a table
@@ -185,8 +184,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Modify `jeonse/templates/account/login.html` template:
         ```html
         <!-- jeonse/templates/account/login.html -->
-        
-        <form method="POST">{% csrf_token %}
+                
+        <form method="POST">
+            {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Login</button>
         </form>
@@ -195,7 +195,8 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ```html
         <!-- jeonse/templates/account/logout.html -->
 
-        <form method="POST">{% csrf_token %}
+        <form method="POST">
+            {% csrf_token %}
             <button type="submit">Logout</button>
         </form>
         ```
@@ -203,7 +204,8 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ```html
         <!-- jeonse/templates/account/signup.html -->
 
-        <form method="POST">{% csrf_token %}
+        <form method="POST">
+            {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Signup</button>
         </form>
@@ -353,7 +355,8 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <!-- jeonse/templates/listing_create.html -->
 
         <h1>Listing Create</h1>
-        <form method="POST">{% csrf_token %}
+        <form method="POST">
+            {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Create</button>
         </form>
@@ -381,7 +384,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <h1>Listing List</h1>
         <ul>
             {% for listing in object_list %}
-                <li><a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a></li>
+                <li>
+                    <a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a>
+                </li>
             {% endfor %}
         </ul>
         ```
@@ -413,7 +418,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
 ### 4. User Authentication and Permissions
 
-1. **Restricting views and actions to creators**
+1. **Restricting views and actions to authenticated users and listing creator's objects**
 
     1. Create `mixins.py`:
         ```bash
@@ -504,48 +509,75 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
 1. **Adding Bootstrap**
 
-    1. Got to the https://getbootstrap.com/docs/5.3/getting-started/download/ website and copy the CDN links:
-        ```html
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-        ```
-    1. Create `base.html`, `navbar.html`, and `footer.html`:
+    1. Create `_base.html` in `jeonse/templates/`:
         ```bash
-        touch jeonse/templates/base.html jeonse/templates/navbar.html jeonse/templates/footer.html
+        touch jeonse/templates/_base.html
         ```
+    1. Create `includes` directory in `jeonse/templates/`:
+        ```bash
+        mkdir jeonse/templates/includes
         ```
-    1. Modify `base.html`:
+    1. Create `head.html`, `navbar.html`, `footer.html`, and `scripts.html` in `jeonse/templates/includes/`:
+        ```bash
+        touch jeonse/templates/includes/head.html
+        touch jeonse/templates/includes/navbar.html
+        touch jeonse/templates/includes/footer.html
+        touch jeonse/templates/includes/scripts.html
+        ```
+    1. Modify `jeonse/templates/_base.html`:
         ```html
-        <!-- jeonse/templates/base.html -->
+        <!-- jeonse/templates/_base.html -->
 
         <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{% block title %}Jeonse{% endblock %}</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-        </head>
-
-        <body>
-            {% block navbar %}
-                {% include "navbar.html" %}
+        <html lang="en" class="h-100">
+            <head>
+                {% block head %}
+                    {% include "includes/head.html" %}
+                {% endblock %}
+            </head>
+            <body class="d-flex flex-column h-100">
+                {% block navbar %}
+                    {% include "includes/navbar.html" %}
+                {% endblock %}
+                <main class="container flex-shrink-0 py-3">
+                    {% block content %}{% endblock %}
+                </main>
+                {% block footer %}
+                    {% include "includes/footer.html" %}
+                {% endblock %}
+            </body>
+            {% block scripts %}
+                {% include "includes/scripts.html" %}
             {% endblock %}
-            
-            {% block content %}
-            {% endblock %}
-
-            {% block footer %}
-                {% include "footer.html" %}
-            {% endblock %}
-        </body>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
         </html>
         ```
-    1. Modify `navbar.html`:
+    1. Got to the https://getbootstrap.com/docs/5.3/getting-started/download/#cdn-via-jsdelivr website and copy the CDN links:
         ```html
-        <!-- jeonse/templates/navbar.html -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        ```
+        ```html
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+        ```
+    1. Modify `jeonse/templates/includes/head.html`:
+        ```html
+        <!-- jeonse/templates/includes/head.html -->
+
+        <meta charset="UTF-8"/>
+        <meta name="viewport"
+            content="width=device-width,minimum-scale=1,initial-scale=1"/>
+        <title>
+            {% block title %}Jeonse{% endblock %}
+        </title>
+        <meta name="author" content="Your name"/>
+        <meta name="description" content="Compare rental listings"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+            crossorigin="anonymous">
+        ```
+    1. Modify `jeonse/templates/includes/navbar.html`:
+        ```html
+        <!-- jeonse/templates/includes/navbar.html -->
 
         <nav class="navbar bg-light">
             <div class="container">
@@ -560,109 +592,148 @@ In this tutorial, we will build a rental listing website using Django, a popular
             </div>
         </nav>
         ```
-    1. Modify `footer.html`:
+    1. Modify `jeonse/templates/includes/footer.html`:
         ```html
-        <!-- jeonse/templates/footer.html -->
+        <!-- jeonse/templates/includes/footer.html -->
 
-        <footer class="navbar bg-dark fixed-bottom">
+        <nav class="navbar navbar-dark bg-dark text-light small mt-auto">
             <div class="container">
-                <a class="navbar-brand text-white" href="{% url 'listing_list' %}">Jeonse</a>
+                <div>{% now 'Y' %} © Your Name. All rights reserved.</div>
             </div>
-        </footer>
+        </nav>
         ```
-    1. Modify `account\login.html`:
+    1. Modify `jeonse/templates/includes/scripts.html`:
+        ```html
+        <!-- jeonse/templates/scripts.html -->
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+                crossorigin="anonymous"></script>
+        ```
+    1. Modify `jeonse/templates/account/login.html`:
         ```html
         <!-- jeonse/templates/account/login.html -->
 
-        {% extends "base.html" %}
-
+        {% extends "_base.html" %}
         {% block title %}Login{% endblock %}
-
         {% block content %}
-        <form method="POST">{% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn btn-primary" type="submit">Login</button>
-        </form>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-warning" type="submit">Login</button>
+            </form>
         {% endblock %}
         ```
-    1. Modify `account\logout.html`:
+    1. Modify `jeonse/templates/account/logout.html`:
         ```html
         <!-- jeonse/templates/account/logout.html -->
 
-        {% extends "base.html" %}
-
+        {% extends "_base.html" %}
         {% block title %}Logout{% endblock %}
-
         {% block content %}
-        <form method="POST">{% csrf_token %}
-            <button class="btn btn-primary" type="submit">Logout</button>
-        </form>
+            <form method="POST">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">Logout</button>
+            </form>
         {% endblock %}
         ```
-    1. Modify `account\signup.html`:
+    1. Modify `jeonse/templates/account/signup.html`:
         ```html
         <!-- jeonse/templates/account/signup.html -->
 
-        {% extends "base.html" %}
-
+        {% extends "_base.html" %}
         {% block title %}Signup{% endblock %}
-
         {% block content %}
-        <form method="POST">{% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn btn-primary" class="btn" type="submit">Signup</button>
-        </form>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-warning" type="submit">Signup</button>
+            </form>
         {% endblock %}
         ```
-    1. Modify `listing_create.html`:
+    1. Modify `jeonse/templates/jeonse/listing_list.html`:
         ```html
-        <!-- jeonse/templates/listing_create.html -->
+        <!-- jeonse/templates/jeonse/listing_create.html -->
 
-        {% extends "base.html" %}
-
+        {% extends "_base.html" %}
         {% block title %}Listing Create{% endblock %}
-
         {% block content %}
-        <h1>Listing Create</h1>
-        <form method="POST">{% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Create</button>
-        </form>
+            <h1>Listing Create</h1>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-warning">Create</button>
+            </form>
         {% endblock %}
         ```
-    1. Modify `listing_detail.html`:
+    1. Modify `jeonse/templates/jeonse/listing_list.html`:
         ```html
-        <!-- jeonse/templates/listing_detail.html -->
+        <!-- jeonse/templates/jeonse/listing_detail.html -->
 
-        {% extends "base.html" %}
-
+        {% extends "_base.html" %}
         {% block title %}Listing Detail{% endblock %}
-
         {% block content %}
-        <h1>Listing Detail</h1>
-        <p>{{ object.creator }}</p>
-        <p>{{ object.jeonse_deposit_amount }}</p>
+            <h1>Listing {{ object.pk }}</h1>
+            <p>전세금: {{ object.jeonse_deposit_amount }}</p>
+            <p>월세금: {{ object.wolse_deposit_amount }}</p>
+            <p>월세: {{ object.wolse_monthly_payment }}</p>
+            <p>월관리비: {{ object.gwanlibi_monthly_payment }}</p>
+            <p>총 월세: {{ object.total_monthly_payment }}</p>
+            <p>대출 이자율: {{ object.annual_interest_rate }}</p>
+            <p>전용면적: {{ object.total_area }}</p>
+            <p>방개수: {{ object.number_of_rooms }}</p>
+            <p>욕실개수: {{ object.number_of_bathrooms }}</p>
+            <p>코멘트: {{ object.comment }}</p>
         {% endblock %}
         ```
-    1. Modify `listing_list.html`:
+    1. Modify `jeonse/templates/jeonse/listing_list.html`:
         ```html
-        <!-- jeonse/templates/listing_list.html -->
+        <!-- jeonse/templates/jeonse/listing_list.html -->
 
-        {% extends "base.html" %}
-
+        {% extends "_base.html" %}
         {% block title %}Listing List{% endblock %}
-
         {% block content %}
             <h1>Listing List</h1>
             <ul>
                 {% for listing in object_list %}
-                    <li><a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a></li>
+                    <li>
+                        <a href="{% url 'listing_detail' listing.pk %}">{{ listing }}</a>
+                    </li>
                 {% endfor %}
             </ul>
         {% endblock %}
         ```
+    1. Modify `jeonse/forms.py`:
+        ```python
+        # jeonse/forms.py
+
+        from django import forms
+
+        from jeonse.models import Listing
+
+
+        class ListingForm(forms.ModelForm):
+            class Meta:
+                model = Listing
+                fields = [
+                    "jeonse_deposit_amount",
+                    "wolse_deposit_amount",
+                    "wolse_monthly_payment",
+                    "gwanlibi_monthly_payment",
+                    "annual_interest_rate",
+                    "total_area",
+                    "number_of_rooms",
+                    "number_of_bathrooms",
+                    "comment",
+                ]
+            
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                for _, field in self.fields.items():
+                    field.widget.attrs.update({"class": "form-control"})
+        ```
     1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+    1. Open browser and go to: http://localhost:8000/
 
 1. **Adding django-tables2**
 

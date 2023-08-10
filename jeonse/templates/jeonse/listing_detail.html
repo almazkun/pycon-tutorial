@@ -1,11 +1,15 @@
-<h1>Listing Detail</h1>
-<p>전세금: {{ object.jeonse_deposit_amount }}</p>
-<p>월세금: {{ object.wolse_deposit_amount }}</p>
-<p>월세: {{ object.wolse_monthly_payment }}</p>
-<p>월관리비: {{ object.gwanlibi_monthly_payment }}</p>
-<p>총 월세: {{ object.total_monthly_payment }}</p>
-<p>대출 이자율: {{ object.annual_interest_rate }}</p>
-<p>전용면적: {{ object.total_area }}</p>
-<p>방개수: {{ object.number_of_rooms }}</p>
-<p>욕실개수: {{ object.number_of_bathrooms }}</p>
-<p>코멘트: {{ object.comment }}</p>
+{% extends "_base.html" %}
+{% block title %}Listing Detail{% endblock %}
+{% block content %}
+    <h1>Listing {{ object.pk }}</h1>
+    <p>전세금: {{ object.jeonse_deposit_amount }}</p>
+    <p>월세금: {{ object.wolse_deposit_amount }}</p>
+    <p>월세: {{ object.wolse_monthly_payment }}</p>
+    <p>월관리비: {{ object.gwanlibi_monthly_payment }}</p>
+    <p>총 월세: {{ object.total_monthly_payment }}</p>
+    <p>대출 이자율: {{ object.annual_interest_rate }}</p>
+    <p>전용면적: {{ object.total_area }}</p>
+    <p>방개수: {{ object.number_of_rooms }}</p>
+    <p>욕실개수: {{ object.number_of_bathrooms }}</p>
+    <p>코멘트: {{ object.comment }}</p>
+{% endblock %}

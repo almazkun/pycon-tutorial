@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+    <head>
+        {% block head %}
+            {% include "includes/head.html" %}
+        {% endblock %}
+    </head>
+    <body class="d-flex flex-column h-100">
+        {% block navbar %}
+            {% include "includes/navbar.html" %}
+        {% endblock %}
+        <main class="container flex-shrink-0 py-3">
+            {% block content %}{% endblock %}
+        </main>
+        {% block footer %}
+            {% include "includes/footer.html" %}
+        {% endblock %}
+    </body>
+    {% block scripts %}
+        {% include "includes/scripts.html" %}
+    {% endblock %}
+</html>
