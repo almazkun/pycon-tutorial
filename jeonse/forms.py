@@ -7,7 +7,6 @@ class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing
         fields = [
-            "creator",
             "jeonse_deposit_amount",
             "wolse_deposit_amount",
             "wolse_monthly_payment",

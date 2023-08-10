@@ -223,9 +223,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Run makemigrations: `python3 manage.py makemigrations`
     1. Run migrate: `python3 manage.py migrate`
     1. Run server: `python3 manage.py runserver`
-    1. Create a new user and login: http://localhost:8000/accounts/signup/.
-    1. Logout: http://localhost:8000/accounts/logout/.
-    1. Login again: http://localhost:8000/accounts/login/.
+    1. Create a new user and login: http://localhost:8000/accounts/signup/
+    1. Logout: http://localhost:8000/accounts/logout/
+    1. Login again: http://localhost:8000/accounts/login/
 
 1. **Create Listing Model and Views**
     1. Create `Listing model` in `jeonse/models.py`:
@@ -406,9 +406,9 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Run makemigrations: `python3 manage.py makemigrations`
     1. Run migrate: `python3 manage.py migrate`
     1. Run server: `python3 manage.py runserver`
-    1. Create a new listing: http://localhost:8000/create/.
-    1. Create a second listing: http://localhost:8000/create/.
-    1. View the listing list: http://localhost:8000/.
+    1. Create a new listing: http://localhost:8000/create/
+    1. Create a second listing: http://localhost:8000/create/
+    1. View the listing list: http://localhost:8000/
     1. View the first listing: http://localhost:8000/1/
 
 ### 4. User Authentication and Permissions
@@ -423,7 +423,12 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ```python
         # jeonse/mixins.py
 
-        from django.contrib.auth.mixins import UserPassesTestMixin
+        from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+
+        class UserIsAuthenticatedMixin(LoginRequiredMixin):
+            pass
+
 
         class UserIsCreatorMixin(UserPassesTestMixin):
             def test_func(self):
@@ -433,51 +438,67 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ```python
         # jeonse/views.py
 
-        from django.views.generic import ListView, DetailView, CreateView
         from django.urls import reverse_lazy
+        from django.views.generic import CreateView, DetailView, ListView
+
         from jeonse.forms import ListingForm
+        from jeonse.mixins import UserIsAuthenticatedMixin, UserIsCreatorMixin
         from jeonse.models import Listing
-        from django.contrib.auth.mixins import LoginRequiredMixin
-        from jeonse.mixins import UserIsCreatorMixin
 
 
-        class ListingListView(LoginRequiredMixin, ListView):
+        class ListingListView(UserIsAuthenticatedMixin, ListView):
             model = Listing
-            template_name = "listing_list.html"
+            template_name = "jeonse/listing_list.html"
 
             def get_queryset(self):
-                return Listing.objects.filter(creator=self.request.user)
+                return self.request.user.listings.all()
 
 
-        class ListingDetailView(LoginRequiredMixin, UserIsCreatorMixin, DetailView):
+        class ListingDetailView(UserIsAuthenticatedMixin, UserIsCreatorMixin, DetailView):
             model = Listing
-            template_name = "listing_detail.html"
+            template_name = "jeonse/listing_detail.html"
 
 
-        class ListingCreateView(LoginRequiredMixin, CreateView):
+        class ListingCreateView(UserIsAuthenticatedMixin, CreateView):
             model = Listing
             form_class = ListingForm
-            template_name = "listing_create.html"
+            template_name = "jeonse/listing_create.html"
             success_url = reverse_lazy("listing_list")
 
             def form_valid(self, form):
                 form.instance.creator = self.request.user
                 return super().form_valid(form)
+
         ``` 
-    1. Modify `jeonse/forms.py`:
+    1. Remove `creator` from fields in `jeonse/models.py`:
         ```python
         from django import forms
+
         from jeonse.models import Listing
+
 
         class ListingForm(forms.ModelForm):
             class Meta:
                 model = Listing
-                fields = "__all__"
-                exclude = ["creator"]  # <-- Add this line
+                fields = [
+                    "jeonse_deposit_amount",
+                    "wolse_deposit_amount",
+                    "wolse_monthly_payment",
+                    "gwanlibi_monthly_payment",
+                    "annual_interest_rate",
+                    "total_area",
+                    "number_of_rooms",
+                    "number_of_bathrooms",
+                    "comment",
+                ]
         ```
     1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000/signin/`: `open http://localhost:8000/signin/`
-    1. Create a new user and create a new listing: `open http://localhost:8000/create/`
+    1. Logout: http://localhost:8000/accounts/logout/
+    1. Create a new user: http://localhost:8000/accounts/signup/
+    1. Create a new listing: http://localhost:8000/create/
+    1. View the listing list: http://localhost:8000/
+    1. View the listing: http://localhost:8000/3/
+    1. Try to view the listing of other user: http://localhost:8000/1/
 
 ### 5. Styling and Appearance
 
