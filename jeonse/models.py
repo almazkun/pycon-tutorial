@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.urls import reverse_lazy
 
 
 def monthly_interest_payment(loan_amount: int, annual_interest_rate: float):
@@ -47,3 +48,6 @@ class Listing(models.Model):
     def save(self, *args, **kwargs):
         self.total_monthly_payment = self._total_monthly_payment()
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy("listing_detail", kwargs={"pk": self.pk})

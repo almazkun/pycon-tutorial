@@ -67,17 +67,41 @@ In this tutorial, we will build a rental listing website using Django, a popular
 1. **Install Python 3.8+ and Django 4.2+**
 
     1. Install python: https://www.python.org/downloads/
-    1. Make a directory for the project: `mkdir django-jeonse`
-    1. Change directory to the project: `cd django-jeonse`
-    1. Install pipenv (we will use it for virtual environment): `pip3 install pipenv`
-    1. Install Django: `pipenv install django==4.2.4`
-    1. Create virtual environment: `pipenv shell`
-    1. Open this project in VS Code: `code .`
+    1. Make a directory for the project: 
+        ```bash
+        mkdir django-jeonse
+        ```
+    1. Change directory to the project: 
+        ```bash
+        cd django-jeonse
+        ```
+    1. Install pipenv (we will use it for virtual environment): 
+        ```bash
+        pip3 install pipenv
+        ```
+    1. Install Django: 
+        ```bash
+        pipenv install django==4.2.4
+        ```
+    1. Activate virtual environment: 
+        ```bash
+        pipenv shell
+        ```
+    1. Open this project in VS Code: 
+        ```bash 
+        code .
+        ```
 
 1. **Create Django project**
 
-    1. Create Django project: `django-admin startproject settings .`
-    1. Create Django app: `python3 manage.py startapp jeonse`
+    1. Create Django project: 
+        ```bash
+        django-admin startproject settings .
+        ```
+    1. Create Django app: 
+        ```bash
+        python3 manage.py startapp jeonse
+        ```
     1. Add `jeonse` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
         # settings/settings.py
@@ -92,7 +116,10 @@ In this tutorial, we will build a rental listing website using Django, a popular
             "jeonse",                                       # <-- Add this line
         ]
         ```
-    1. Run server: `python3 manage.py runserver`
+    1. Run server:  
+        ```bash
+        python3 manage.py runserver
+        ```
     1. Open browser and go to http://localhost:8000.
 
 1. **Custom user model**
@@ -110,12 +137,24 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
         AUTH_USER_MODEL = 'jeonse.CustomUser'
         ```
-    1. Run makemigrations: `python3 manage.py makemigrations`
-    1. Run migrate: `python3 manage.py migrate`
-    1. Run server: `python3 manage.py runserver`
+    1. Run makemigrations: 
+        ```bash
+        python3 manage.py makemigrations
+        ```
+    1. Run migrate: 
+        ```bash
+        python3 manage.py migrate
+        ```
+    1. Run server: 
+        ```bash
+        python3 manage.py runserver
+        ```
 
 1. **Create User Signup and Signin Views**
-    1. Install django-allauth: `pipenv install django-allauth==0.54.0`
+    1. Install django-allauth:  
+        ```bash
+        pipenv install django-allauth==0.54.0
+        ```
     1. Add `allauth` and `allauth.account` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
         # settings/settings.py
@@ -155,7 +194,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ACCOUNT_EMAIL_VERIFICATION = "none"
         LOGIN_REDIRECT_URL = "/"
         ```
-    1. Create `urls.py` in `jeonse` app:
+    1. Create `jeonse/urls.py`:
         ```bash
         touch jeonse/urls.py
         ```
@@ -222,9 +261,18 @@ In this tutorial, we will build a rental listing website using Django, a popular
             path("", include("jeonse.urls")),  # <-- Add this line
         ]
         ```
-    1. Run makemigrations: `python3 manage.py makemigrations`
-    1. Run migrate: `python3 manage.py migrate`
-    1. Run server: `python3 manage.py runserver`
+    1. Run makemigrations: 
+        ```bash
+        python3 manage.py makemigrations
+        ```
+    1. Run migrate:
+        ```bash
+        python3 manage.py migrate
+        ```
+    1. Run server: 
+        ```bash
+        python3 manage.py runserver
+        ```
     1. Create a new user and login: http://localhost:8000/accounts/signup/
     1. Logout: http://localhost:8000/accounts/logout/
     1. Login again: http://localhost:8000/accounts/login/
@@ -408,9 +456,18 @@ In this tutorial, we will build a rental listing website using Django, a popular
             path("create/", ListingCreateView.as_view(), name="listing_create"),
         ]
         ```
-    1. Run makemigrations: `python3 manage.py makemigrations`
-    1. Run migrate: `python3 manage.py migrate`
-    1. Run server: `python3 manage.py runserver`
+    1. Run makemigrations:
+        ```bash
+        python3 manage.py makemigrations
+        ```
+    1. Run migrate:
+        ```bash
+        python3 manage.py migrate
+        ```
+    1. Run server:
+        ```bash
+        python3 manage.py runserver
+        ```
     1. Create a new listing: http://localhost:8000/create/
     1. Create a second listing: http://localhost:8000/create/
     1. View the listing list: http://localhost:8000/
@@ -497,7 +554,10 @@ In this tutorial, we will build a rental listing website using Django, a popular
                     "comment",
                 ]
         ```
-    1. Run server: `python3 manage.py runserver`
+    1. Run server: 
+        ```bash
+        python3 manage.py runserver
+        ```
     1. Logout: http://localhost:8000/accounts/logout/
     1. Create a new user: http://localhost:8000/accounts/signup/
     1. Create a new listing: http://localhost:8000/create/
@@ -732,12 +792,18 @@ In this tutorial, we will build a rental listing website using Django, a popular
                 for _, field in self.fields.items():
                     field.widget.attrs.update({"class": "form-control"})
         ```
-    1. Run server: `python3 manage.py runserver`
+    1. Run server: 
+        ```bash
+        python3 manage.py runserver
+        ```
     1. Open browser and go to: http://localhost:8000/
 
 1. **Adding django-tables2**
 
-    1. Install django-tables2: `pipenv install django-tables2==2.6.0`
+    1. Install [django-tables2](https://pypi.org/project/django-tables2/): 
+        ```bash
+        pipenv install django-tables2==2.6.0
+        ```
     1. Add `django_tables2` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
         # settings/settings.py
@@ -755,7 +821,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             "django_tables2",                   # <-- Add this line
         ]
         ```
-    1. Create `tables.py`:
+    1. Create `jeonse/tables.py`:
         ```bash
         touch jeonse/tables.py
         ```
@@ -767,55 +833,133 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
         from jeonse.models import Listing
 
+
         class ListingTable(tables.Table):
+            get_absolute_url = tables.Column(
+                verbose_name="Detail", linkify=True, orderable=False
+            )
+
             class Meta:
                 model = Listing
                 template_name = "django_tables2/bootstrap5.html"
                 attrs = {"class": "table table-striped table-bordered table-hover"}
+
+            def render_get_absolute_url(self, value):
+                return "Detail"
         ```
     1. Modify `jeonse/views.py`:
         ```python
         # jeonse/views.py
 
-        from django_tables2 import SingleTableView
-
-        from django.contrib.auth.mixins import LoginRequiredMixin
         from django.urls import reverse_lazy
-        from django.views.generic import DetailView, CreateView
+        from django.views.generic import CreateView, DetailView
+        from django_tables2 import SingleTableView                  # <-- Add this line
 
         from jeonse.forms import ListingForm
-        from jeonse.mixins import UserIsCreatorMixin
+        from jeonse.mixins import UserIsAuthenticatedMixin, UserIsCreatorMixin
         from jeonse.models import Listing
-        from jeonse.tables import ListingTable
+        from jeonse.tables import ListingTable                      # <-- Add this line
 
 
-        class ListingListView(LoginRequiredMixin, SingleTableView):
+        class ListingListView(UserIsAuthenticatedMixin, SingleTableView):
             model = Listing
-            template_name = "listing_list.html"
-            table_class = ListingTable
+            template_name = "jeonse/listing_list.html"
+            table_class = ListingTable                                # <-- Add this line
 
             def get_queryset(self):
-                return Listing.objects.filter(creator=self.request.user)
-        ...
+                return self.request.user.listings.all()
+
+
+        class ListingDetailView(UserIsAuthenticatedMixin, UserIsCreatorMixin, DetailView):
+            model = Listing
+            template_name = "jeonse/listing_detail.html"
+
+
+        class ListingCreateView(UserIsAuthenticatedMixin, CreateView):
+            model = Listing
+            form_class = ListingForm
+            template_name = "jeonse/listing_create.html"
+            success_url = reverse_lazy("listing_list")
+
+            def form_valid(self, form):
+                form.instance.creator = self.request.user
+                return super().form_valid(form)
         ```
-    1. Modify `listing_list.html`:
+    1. Modify `jeonse/models.py`:
+        ```python
+        # jeonse/models.py
+
+        from django.contrib.auth.models import AbstractUser
+        from django.db import models
+        from django.urls import reverse_lazy                                      # <-- Add this line
+
+
+        def monthly_interest_payment(loan_amount: int, annual_interest_rate: float):
+            return round(loan_amount * (annual_interest_rate / 12 / 100))
+
+
+        class CustomUser(AbstractUser):
+            pass
+
+
+        class Listing(models.Model):
+            creator = models.ForeignKey(
+                CustomUser, on_delete=models.CASCADE, related_name="listings"
+            )
+
+            jeonse_deposit_amount = models.BigIntegerField("전세금", default=0)
+            wolse_deposit_amount = models.BigIntegerField("월세금", default=0)
+            wolse_monthly_payment = models.IntegerField("월세", default=0)
+            gwanlibi_monthly_payment = models.IntegerField("월관리비", default=0)
+
+            total_monthly_payment = models.IntegerField("총 월세", default=0)
+
+            annual_interest_rate = models.FloatField("대출 이자율", default=0.0)
+
+            total_area = models.FloatField("전용면적", default=0.0)
+            number_of_rooms = models.IntegerField("방개수", default=0)
+            number_of_bathrooms = models.IntegerField("욕실개수", default=0)
+
+            comment = models.TextField("코멘트", blank=True, null=True)
+
+            def _total_monthly_payment(self):
+                interest_payment = monthly_interest_payment(
+                    self.jeonse_deposit_amount + self.wolse_deposit_amount,
+                    self.annual_interest_rate,
+                )
+
+                return sum(
+                    [
+                        interest_payment,
+                        self.wolse_monthly_payment,
+                        self.gwanlibi_monthly_payment,
+                    ]
+                )
+
+            def save(self, *args, **kwargs):
+                self.total_monthly_payment = self._total_monthly_payment()
+                super().save(*args, **kwargs)
+
+            def get_absolute_url(self):                                         # <-- Add this line
+                return reverse_lazy("listing_detail", kwargs={"pk": self.pk})   # <-- Add this line
+        ```
+    1. Modify `jeonse/templates/jeonse/listing_list.html`:
         ```html
-        <!-- jeonse/templates/listing_list.html -->
+        <!-- jeonse/templates/jeonse/listing_list.html -->
 
-        {% extends "base.html" %}
+        {% extends "_base.html" %}
         {% load render_table from django_tables2 %}
-
         {% block title %}Listing List{% endblock %}
-
         {% block content %}
             <h1>Listing List</h1>
-            <div class="overflow-auto">
-                {% render_table table %}
-            </div>
+            <div class="overflow-auto">{% render_table table %}</div>
         {% endblock %}
         ```
-    1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+    1. Run server: 
+        ```bash
+        python3 manage.py runserver
+        ```
+    1. Open browser and go to http://localhost:8000/
 
 ### 6. Search and Filtering
 

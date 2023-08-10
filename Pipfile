@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 django = "==4.2.4"
 django-allauth = "==0.54.0"
+django-tables2 = "==2.6.0"
 
 [dev-packages]
 
