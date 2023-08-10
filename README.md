@@ -625,9 +625,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <meta charset="UTF-8"/>
         <meta name="viewport"
             content="width=device-width,minimum-scale=1,initial-scale=1"/>
-        <title>
-            {% block title %}Jeonse{% endblock %}
-        </title>
+        <title>Jeonse</title>
         <meta name="author" content="Your name"/>
         <meta name="description" content="Compare rental listings"/>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
@@ -675,7 +673,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <!-- jeonse/templates/account/login.html -->
 
         {% extends "_base.html" %}
-        {% block title %}Login{% endblock %}
         {% block content %}
             <form method="POST">
                 {% csrf_token %}
@@ -689,7 +686,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <!-- jeonse/templates/account/logout.html -->
 
         {% extends "_base.html" %}
-        {% block title %}Logout{% endblock %}
         {% block content %}
             <form method="POST">
                 {% csrf_token %}
@@ -702,7 +698,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <!-- jeonse/templates/account/signup.html -->
 
         {% extends "_base.html" %}
-        {% block title %}Signup{% endblock %}
         {% block content %}
             <form method="POST">
                 {% csrf_token %}
@@ -716,7 +711,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <!-- jeonse/templates/jeonse/listing_create.html -->
 
         {% extends "_base.html" %}
-        {% block title %}Listing Create{% endblock %}
         {% block content %}
             <h1>Listing Create</h1>
             <form method="POST">
@@ -731,7 +725,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <!-- jeonse/templates/jeonse/listing_detail.html -->
 
         {% extends "_base.html" %}
-        {% block title %}Listing Detail{% endblock %}
         {% block content %}
             <h1>Listing {{ object.pk }}</h1>
             <p>전세금: {{ object.jeonse_deposit_amount }}</p>
@@ -751,7 +744,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
         <!-- jeonse/templates/jeonse/listing_list.html -->
 
         {% extends "_base.html" %}
-        {% block title %}Listing List{% endblock %}
         {% block content %}
             <h1>Listing List</h1>
             <ul>
@@ -949,7 +941,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
         {% extends "_base.html" %}
         {% load render_table from django_tables2 %}
-        {% block title %}Listing List{% endblock %}
         {% block content %}
             <h1>Listing List</h1>
             <div class="overflow-auto">{% render_table table %}</div>
@@ -965,7 +956,10 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
 1. **Adding django-filter to enable advanced search and filtering**
 
-    1. Install django-filter: `pipenv install django-filter==23.2`
+    1. Install [django-filter](https://pypi.org/project/django-filter/): 
+        ```bash
+        pipenv install django-filter==23.2
+        ```
     1. Add `django_filters` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
         # settings/settings.py
@@ -993,59 +987,86 @@ In this tutorial, we will build a rental listing website using Django, a popular
         # jeonse/filters.py
 
         import django_filters
+        from django import forms
 
         from jeonse.models import Listing
 
 
         class ListingFilter(django_filters.FilterSet):
-            
+            total_monthly_payment = django_filters.NumberFilter(
+                field_name="total_monthly_payment",
+                lookup_expr="lte",
+                widget=forms.widgets.TextInput(attrs={"class": "form-control form-control-sm"}),
+            )
+
             class Meta:
                 model = Listing
-                fields = {
-                    "jeonse_deposit_amount": ["lte",],
-                    "wolse_deposit_amount": ["lte",],
-                    "total_monthly_payment": ["lte",],
-                }
+                fields = ["total_monthly_payment"]
         ```
     1. Modify `jeonse/views.py`:
         ```python
         # jeonse/views.py
 
-        ...
-        from django_filters.views import FilterView
-        from jeonse.filters import ListingFilter
-        ...
-        
-        class ListingListView(LoginRequiredMixin, FilterView, SingleTableView):
+        from django.urls import reverse_lazy
+        from django.views.generic import CreateView, DetailView
+        from django_filters.views import FilterView                         # <-- Add this line
+        from django_tables2 import SingleTableView
+
+        from jeonse.filters import ListingFilter                            # <-- Add this line
+        from jeonse.forms import ListingForm
+        from jeonse.mixins import UserIsAuthenticatedMixin, UserIsCreatorMixin
+        from jeonse.models import Listing
+        from jeonse.tables import ListingTable
+
+
+        class ListingListView(UserIsAuthenticatedMixin, FilterView, SingleTableView):  # <-- Modify this line
             model = Listing
-            template_name = "listing_list.html"
+            template_name = "jeonse/listing_list.html"
             table_class = ListingTable
-            filterset_class = ListingFilter
+            filterset_class = ListingFilter                                    # <-- Add this line
 
             def get_queryset(self):
-                return Listing.objects.filter(creator=self.request.user)
-        ...
+                return self.request.user.listings.all()
+
+
+        class ListingDetailView(UserIsAuthenticatedMixin, UserIsCreatorMixin, DetailView):
+            model = Listing
+            template_name = "jeonse/listing_detail.html"
+
+
+        class ListingCreateView(UserIsAuthenticatedMixin, CreateView):
+            model = Listing
+            form_class = ListingForm
+            template_name = "jeonse/listing_create.html"
+            success_url = reverse_lazy("listing_list")
+
+            def form_valid(self, form):
+                form.instance.creator = self.request.user
+                return super().form_valid(form)
+
         ```
-    1. Modify `listing_list.html`:
+    1. Modify `jeonse/templates/jeonse/listing_list.html`:
         ```html
-        <!-- jeonse/templates/listing_list.html -->
+        <!-- jeonse/templates/jeonse/listing_list.html -->
 
-        {% extends "base.html" %}
+        {% extends "_base.html" %}
         {% load render_table from django_tables2 %}
-
-        {% block title %}Listing List{% endblock %}
-
         {% block content %}
             <h1>Listing List</h1>
             <form method="GET">
-                {{ filter.form.as_p }}
-                <button type="submit">Search</button>
+                <div class="input-group my-2">
+                    {{ filter.form }}
+                    <button type="submit" class="btn btn-sm btn-outline-warning">Search</button>
+                </div>
             </form>
-            {% render_table table %}
+            <div class="overflow-auto">{% render_table table %}</div>
         {% endblock %}
         ```
-    1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+    1. Run server: 
+        ```bash
+        python3 manage.py runserver
+        ```
+    1. Open browser and go to: http://localhost:8000/
 
 ### 7. Request optimization
 
@@ -1117,7 +1138,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
         {% extends "base.html" %}
 
-        {% block title %}Listing List{% endblock %}
+
 
         {% block content %}
             {% include "htmx/listing_list.html" %}

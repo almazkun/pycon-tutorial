@@ -1,17 +1,20 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
+from django_filters.views import FilterView
 from django_tables2 import SingleTableView
 
+from jeonse.filters import ListingFilter
 from jeonse.forms import ListingForm
 from jeonse.mixins import UserIsAuthenticatedMixin, UserIsCreatorMixin
 from jeonse.models import Listing
 from jeonse.tables import ListingTable
 
 
-class ListingListView(UserIsAuthenticatedMixin, SingleTableView):
+class ListingListView(UserIsAuthenticatedMixin, FilterView, SingleTableView):
     model = Listing
     template_name = "jeonse/listing_list.html"
     table_class = ListingTable
+    filterset_class = ListingFilter
 
     def get_queryset(self):
         return self.request.user.listings.all()
