@@ -94,7 +94,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ]
         ```
     1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000`: `open http://localhost:8000`
+    1. Open browser and go to http://localhost:8000.
 
 1. **Custom user model**
     1. Open `jeonse/models.py` and add `CustomUser` model:
@@ -174,7 +174,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ]
 
         ```
-    1. Create templated:
+    1. Create templates directory and login, logout, and signup templates in `jeonse/templates/account`:
         ```
         mkdir jeonse/templates
         mkdir jeonse/templates/account
@@ -182,7 +182,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         touch jeonse/templates/account/logout.html
         touch jeonse/templates/account/signup.html
         ```    
-    1. Modify templates:
+    1. Modify `jeonse/templates/account/login.html` template:
         ```html
         <!-- jeonse/templates/account/login.html -->
         
@@ -191,6 +191,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             <button type="submit">Login</button>
         </form>
         ```
+    1. Modify `jeonse/templates/account/logout.html` template:
         ```html
         <!-- jeonse/templates/account/logout.html -->
 
@@ -198,6 +199,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             <button type="submit">Logout</button>
         </form>
         ```
+    1. Modify `jeonse/templates/account/signup.html` template:
         ```html
         <!-- jeonse/templates/account/signup.html -->
 
@@ -206,7 +208,6 @@ In this tutorial, we will build a rental listing website using Django, a popular
             <button type="submit">Signup</button>
         </form>
         ```
-        
     1. Include `jeonse.urls` in `settings/urls.py`:
         ```python
         # settings/urls.py
@@ -222,86 +223,158 @@ In this tutorial, we will build a rental listing website using Django, a popular
     1. Run makemigrations: `python3 manage.py makemigrations`
     1. Run migrate: `python3 manage.py migrate`
     1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000/accounts/signup/`: `open http://localhost:8000/accounts/signup/`
-    1. Create a new user and login
-    1. Open browser and go to `http://localhost:8000/accounts/logout/`: `open http://localhost:8000/accounts/logout/`
-    1. Logout and login again
+    1. Create a new user and login: http://localhost:8000/accounts/signup/.
+    1. Logout: http://localhost:8000/accounts/logout/.
+    1. Login again: http://localhost:8000/accounts/login/.
 
 1. **Create Listing Model and Views**
-    1. Create `Listing model`:
+    1. Create `Listing model` in `jeonse/models.py`:
         ```python
         # jeonse/models.py
+
+        from django.contrib.auth.models import AbstractUser
         from django.db import models
 
+
+        def monthly_interest_payment(loan_amount: int, annual_interest_rate: float):
+            return round(loan_amount * (annual_interest_rate / 12 / 100))
+
+
+        class CustomUser(AbstractUser):
+            pass
+
+
         class Listing(models.Model):
-            creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="creator")
+            creator = models.ForeignKey(
+                CustomUser, on_delete=models.CASCADE, related_name="listings"
+            )
+
             jeonse_deposit_amount = models.BigIntegerField("전세금", default=0)
             wolse_deposit_amount = models.BigIntegerField("월세금", default=0)
-            wolse_monthly_amount = models.IntegerField("월세", default=0)
-            gwanlibi_monthly_amount = models.IntegerField("월관리비", default=0)
+            wolse_monthly_payment = models.IntegerField("월세", default=0)
+            gwanlibi_monthly_payment = models.IntegerField("월관리비", default=0)
 
-            loan_amount = models.BigIntegerField("대출금", default=0)
-            loan_interest_rate = models.FloatField("대출금리", default=0.0)
-            
-            total_monthly_payment = models.IntegerField("월납부금", default=0)
-            
+            total_monthly_payment = models.IntegerField("총 월세", default=0)
+
+            annual_interest_rate = models.FloatField("대출 이자율", default=0.0)
+
             total_area = models.FloatField("전용면적", default=0.0)
             number_of_rooms = models.IntegerField("방개수", default=0)
             number_of_bathrooms = models.IntegerField("욕실개수", default=0)
-            
-            comment = models.TextField("코멘트", default="")
+
+            comment = models.TextField("코멘트", blank=True, null=True)
+
+            def _total_monthly_payment(self):
+                interest_payment = monthly_interest_payment(
+                    self.jeonse_deposit_amount + self.wolse_deposit_amount,
+                    self.annual_interest_rate,
+                )
+
+                return sum(
+                    [
+                        interest_payment,
+                        self.wolse_monthly_payment,
+                        self.gwanlibi_monthly_payment,
+                    ]
+                )
+
+            def save(self, *args, **kwargs):
+                self.total_monthly_payment = self._total_monthly_payment()
+                super().save(*args, **kwargs)
         ```
-    
-    1. Create `ListingForm`:
+    1. Create `jeonse/forms.py`:
         ```bash
-        mkdir jeonse/forms
+        touch jeonse/forms.py
         ```
+    1. Create `ListingForm` in `jeonse/forms.py`:
         ```python
         # jeonse/forms.py
+
         from django import forms
+
         from jeonse.models import Listing
+
 
         class ListingForm(forms.ModelForm):
             class Meta:
                 model = Listing
-                fields = "__all__"
+                fields = [
+                    "creator",
+                    "jeonse_deposit_amount",
+                    "wolse_deposit_amount",
+                    "wolse_monthly_payment",
+                    "gwanlibi_monthly_payment",
+                    "annual_interest_rate",
+                    "total_area",
+                    "number_of_rooms",
+                    "number_of_bathrooms",
+                    "comment",
+                ]
         ```
-
-    1. Create `ListingListView`, `ListingDetailView`, and `ListingCreateView`:
+    1. Create `ListingListView`, `ListingDetailView`, and `ListingCreateView` in `jeonse/views.py`:
         ```python
         # jeonse/views.py
 
-        from django.views.generic import ListView, DetailView, CreateView
         from django.urls import reverse_lazy
+        from django.views.generic import CreateView, DetailView, ListView
+
         from jeonse.forms import ListingForm
         from jeonse.models import Listing
 
 
         class ListingListView(ListView):
             model = Listing
-            template_name = "listing_list.html"
+            template_name = "jeonse/listing_list.html"
 
 
         class ListingDetailView(DetailView):
             model = Listing
-            template_name = "listing_detail.html"
+            template_name = "jeonse/listing_detail.html"
 
-        
+
         class ListingCreateView(CreateView):
             model = Listing
             form_class = ListingForm
-            template_name = "listing_create.html"
+            template_name = "jeonse/listing_create.html"
             success_url = reverse_lazy("listing_list")
+
         ```
     
-    1. Create `listing_list.html`, `listing_detail.html`, and `listing_create.html`:
+    1. Create `listing_list.html`, `listing_detail.html`, and `listing_create.html` in `jeonse/templates/jeonse/`:
         ```bash
-        touch jeonse/templates/listing_list.html
-        touch jeonse/templates/listing_detail.html
-        touch jeonse/templates/listing_create.html
+        mkdir jeonse/templates/jeonse
+        touch jeonse/templates/jeonse/listing_create.html
+        touch jeonse/templates/jeonse/listing_detail.html
+        touch jeonse/templates/jeonse/listing_list.html
         ```
 
-    1. Modify templates:
+    1. Modify `jeonse/templates/jeonse/listing_create.html`:
+        ```html
+        <!-- jeonse/templates/listing_create.html -->
+
+        <h1>Listing Create</h1>
+        <form method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Create</button>
+        </form>
+        ```
+    1. Modify `jeonse/templates/jeonse/listing_detail.html`:
+        ```html
+        <!-- jeonse/templates/listing_detail.html -->
+
+        <h1>Listing Detail</h1>
+        <p>전세금: {{ object.jeonse_deposit_amount }}</p>
+        <p>월세금: {{ object.wolse_deposit_amount }}</p>
+        <p>월세: {{ object.wolse_monthly_payment }}</p>
+        <p>월관리비: {{ object.gwanlibi_monthly_payment }}</p>
+        <p>총 월세: {{ object.total_monthly_payment }}</p>
+        <p>대출 이자율: {{ object.annual_interest_rate }}</p>
+        <p>전용면적: {{ object.total_area }}</p>
+        <p>방개수: {{ object.number_of_rooms }}</p>
+        <p>욕실개수: {{ object.number_of_bathrooms }}</p>
+        <p>코멘트: {{ object.comment }}</p>
+        ```
+    1. Modify `jeonse/templates/jeonse/listing_list.html`:
         ```html
         <!-- jeonse/templates/listing_list.html -->
 
@@ -312,42 +385,31 @@ In this tutorial, we will build a rental listing website using Django, a popular
             {% endfor %}
         </ul>
         ```
-        ```html
-        <!-- jeonse/templates/listing_detail.html -->
-
-        <h1>Listing Detail</h1>
-        <p>{{ object }}</p>
-        ```
-        ```html
-        <!-- jeonse/templates/listing_create.html -->
-
-        <h1>Listing Create</h1>
-        <form method="POST">{% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Create</button>
-        </form>
-        ```
-    
-    1. Add urls to `jeonse/urls.py`:
+    1. Modify `jeonse/urls.py`:
         ```python
         # jeonse/urls.py
 
-        from jeonse.views import ListingListView, ListingDetailView, ListingCreateView
+        from allauth.account import views as allauth_views
+        from django.urls import path
+
+        from jeonse.views import ListingCreateView, ListingDetailView, ListingListView
 
         urlpatterns = [
-            ...
-            path('', ListingListView.as_view(), name="listing_list"),
-            path('<int:pk>/', ListingDetailView.as_view(), name="listing_detail"),
-            path('create/', ListingCreateView.as_view(), name="listing_create"),
+            path("accounts/login/", allauth_views.LoginView.as_view(), name="account_login"),
+            path("accounts/logout/", allauth_views.LogoutView.as_view(), name="account_logout"),
+            path("accounts/signup/", allauth_views.SignupView.as_view(), name="account_signup"),
+            path("", ListingListView.as_view(), name="listing_list"),
+            path("<int:pk>/", ListingDetailView.as_view(), name="listing_detail"),
+            path("create/", ListingCreateView.as_view(), name="listing_create"),
         ]
         ```
-    
     1. Run makemigrations: `python3 manage.py makemigrations`
     1. Run migrate: `python3 manage.py migrate`
     1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
-    1. Create a new listing: `open http://localhost:8000/create/`
-    1. View the listing: `open http://localhost:8000/1/`
+    1. Create a new listing: http://localhost:8000/create/.
+    1. Create a second listing: http://localhost:8000/create/.
+    1. View the listing list: http://localhost:8000/.
+    1. View the first listing: http://localhost:8000/1/
 
 ### 4. User Authentication and Permissions
 
