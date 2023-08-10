@@ -1072,44 +1072,59 @@ In this tutorial, we will build a rental listing website using Django, a popular
 
 1. **Adding django-htmx to optimize user interactions**
 
-    1. Install `django-htmx`: `pipenv install django-htmx==1.16.0`
+    1. Install [django-htmx](https://pypi.org/project/django-htmx/): 
+        ```bash
+        pipenv install django-htmx==1.16.0
+        ```
     1. Add `django_htmx` to `INSTALLED_APPS` in `settings/settings.py`:
         ```python
         # settings/settings.py
 
         INSTALLED_APPS = [
-            ...
-            "django_htmx",                           # <-- Add this line
+            "django.contrib.admin",
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
+            "django.contrib.messages",
+            "django.contrib.staticfiles",
+            "jeonse",
+            "allauth",
+            "allauth.account",
+            "django_tables2",
+            "django_filters",
+            "django_htmx",                              # <-- Add this line
         ]
         ```
     1. Add `django_htmx.middleware.HtmxMiddleware` middleware:
         ```python
         # settings/settings.py
-        
+                
         MIDDLEWARE = [
-            ...
-            "django_htmx.middleware.HtmxMiddleware", # <-- Add this line
+            "django.middleware.security.SecurityMiddleware",
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.middleware.common.CommonMiddleware",
+            "django.middleware.csrf.CsrfViewMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            "django.contrib.messages.middleware.MessageMiddleware",
+            "django.middleware.clickjacking.XFrameOptionsMiddleware",
+            "django_htmx.middleware.HtmxMiddleware",    # <-- Add this line
         ]
         ```
-    1. Add `id="content"` to `base.html`:
+    1. Get the HTMX script from https://htmx.org/docs/#via-a-cdn-e-g-unpkg-com:
         ```html
-        <!-- jeonse/templates/base.html -->
-
-        <div id="content" class="container">
-            {% block content %}
-            {% endblock %}
-        </div>
+        <script src="https://unpkg.com/htmx.org@1.9.4" integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV" crossorigin="anonymous"></script>
         ```
-    1. Add `<script src="https://unpkg.com/htmx.org@1.9.3" integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua" crossorigin="anonymous"></script>` to `base.html` as the last line:
+    1. Add HTMX script to `jeonse/templates/includes/scripts/`
         ```html
-        <!-- jeonse/templates/base.html -->
-        <div id="content" class="container">
-            {% block content %}
-            {% endblock %}
-        </div>
-        ...
-        <script src="https://unpkg.com/htmx.org@1.9.3" integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua" crossorigin="anonymous"></script>
-        </html>
+        <!-- jeonse/templates/includes/scripts/htmx.html -->
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+
+        <script src="https://unpkg.com/htmx.org@1.9.4"
+                integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
+                crossorigin="anonymous"></script>
         ```
     1. Create directory for `htmx` templates:
         ```bash
@@ -1119,47 +1134,84 @@ In this tutorial, we will build a rental listing website using Django, a popular
         ```bash
         touch jeonse/templates/htmx/listing_list.html
         ```
-    1. Modify `htmx/listing_list.html`:
+    1. Modify `jeonse/templates/jeonse/listing_list.html`:
+        ```html
+        <!-- jeonse/templates/jeonse/listing_list.html -->
+
+        {% extends "_base.html" %}
+        {% block content %}
+            <h1>Listing List</h1>
+            <form hx-get="" hx-target="#table">
+                <div class="input-group my-2">
+                    {{ filter.form }}
+                    <button type="submit" class="btn btn-sm btn-outline-warning">Search</button>
+                </div>
+            </form>
+            {% include "htmx/listing_list.html" %}
+        {% endblock %}
+        ```
+
+
+    1. Modify `jeonse/templates/htmx/listing_list.html`:
         ```html
         <!-- jeonse/templates/htmx/listing_list.html -->
 
         {% load render_table from django_tables2 %}
-
-        <h1>Listing List</h1>
-        <form hx-get="" hx-target="#content">
-            {{ filter.form.as_p }}
-            <button type="submit">Search</button>
-        </form>
-        {% render_table table %}
+        <div id="table" class="overflow-auto">{% render_table table %}</div>
         ```
-    1. Modify `templates/listing_list.html`:
-        ```html
-        <!-- jeonse/templates/listing_list.html -->
 
-        {% extends "base.html" %}
-
-
-
-        {% block content %}
-            {% include "htmx/listing_list.html" %}
-        {% endblock %}
-        ```
     1. Modify `ListingListView` in `jeonse/views.py`:
         ```python
         # jeonse/views.py
 
-        ...
-        class ListingListView(LoginRequiredMixin, FilterView, SingleTableView):
-            ...
+        from django.urls import reverse_lazy
+        from django.views.generic import CreateView, DetailView
+        from django_filters.views import FilterView
+        from django_tables2 import SingleTableView
 
-            def get_template_names(self) -> List[str]:
-                if self.request.htmx:
-                    return ["htmx/listing_list.html"]
-                return super().get_template_names()
-        ...
+        from jeonse.filters import ListingFilter
+        from jeonse.forms import ListingForm
+        from jeonse.mixins import UserIsAuthenticatedMixin, UserIsCreatorMixin
+        from jeonse.models import Listing
+        from jeonse.tables import ListingTable
+
+
+        class ListingListView(UserIsAuthenticatedMixin, FilterView, SingleTableView):
+            model = Listing
+            template_name = "jeonse/listing_list.html"
+            table_class = ListingTable
+            filterset_class = ListingFilter
+
+            def get_queryset(self):
+                return self.request.user.listings.all()
+
+            def get_template_names(self):                           # <-- Add this method
+                if self.request.htmx:                               # <-- Add this line    
+                    return ["htmx/listing_list.html"]               # <-- Add this line
+                return super().get_template_names()                 # <-- Add this line
+
+
+        class ListingDetailView(UserIsAuthenticatedMixin, UserIsCreatorMixin, DetailView):
+            model = Listing
+            template_name = "jeonse/listing_detail.html"
+
+
+        class ListingCreateView(UserIsAuthenticatedMixin, CreateView):
+            model = Listing
+            form_class = ListingForm
+            template_name = "jeonse/listing_create.html"
+            success_url = reverse_lazy("listing_list")
+
+            def form_valid(self, form):
+                form.instance.creator = self.request.user
+                return super().form_valid(form)
+
         ```
-    1. Run server: `python3 manage.py runserver`
-    1. Open browser and go to `http://localhost:8000/`: `open http://localhost:8000/`
+    1. Run server: 
+        ```bash
+        python3 manage.py runserver
+        ```
+    1. Open browser and go to: http://localhost:8000/
 
 ### 8. Testing the Application
 

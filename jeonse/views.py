@@ -19,6 +19,11 @@ class ListingListView(UserIsAuthenticatedMixin, FilterView, SingleTableView):
     def get_queryset(self):
         return self.request.user.listings.all()
 
+    def get_template_names(self):
+        if self.request.htmx:
+            return ["htmx/listing_list.html"]
+        return super().get_template_names()
+
 
 class ListingDetailView(UserIsAuthenticatedMixin, UserIsCreatorMixin, DetailView):
     model = Listing

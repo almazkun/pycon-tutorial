@@ -1,12 +1,11 @@
 {% extends "_base.html" %}
-{% load render_table from django_tables2 %}
 {% block content %}
     <h1>Listing List</h1>
-    <form method="GET">
+    <form hx-get="" hx-target="#table">
         <div class="input-group my-2">
             {{ filter.form }}
             <button type="submit" class="btn btn-sm btn-outline-warning">Search</button>
         </div>
     </form>
-    <div class="overflow-auto">{% render_table table %}</div>
+    {% include "htmx/listing_list.html" %}
 {% endblock %}
