@@ -532,8 +532,10 @@ In this tutorial, we will build a rental listing website using Django, a popular
                 return super().form_valid(form)
 
         ``` 
-    1. Remove `creator` from fields in `jeonse/models.py`:
+    1. Remove `creator` from fields in `jeonse/forms.py`:
         ```python
+        # jeonse/forms.py
+
         from django import forms
 
         from jeonse.models import Listing
@@ -706,7 +708,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             </form>
         {% endblock %}
         ```
-    1. Modify `jeonse/templates/jeonse/listing_list.html`:
+    1. Modify `jeonse/templates/jeonse/listing_create.html`:
         ```html
         <!-- jeonse/templates/jeonse/listing_create.html -->
 
@@ -720,7 +722,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
             </form>
         {% endblock %}
         ```
-    1. Modify `jeonse/templates/jeonse/listing_list.html`:
+    1. Modify `jeonse/templates/jeonse/listing_detail.html`:
         ```html
         <!-- jeonse/templates/jeonse/listing_detail.html -->
 
@@ -853,7 +855,7 @@ In this tutorial, we will build a rental listing website using Django, a popular
         from jeonse.tables import ListingTable                      # <-- Add this line
 
 
-        class ListingListView(UserIsAuthenticatedMixin, SingleTableView):
+        class ListingListView(UserIsAuthenticatedMixin, SingleTableView): # <-- Modify this line
             model = Listing
             template_name = "jeonse/listing_list.html"
             table_class = ListingTable                                # <-- Add this line
